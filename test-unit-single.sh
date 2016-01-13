@@ -2,14 +2,17 @@
 
 if [ ! -d ./src ]
 then
-    touch jest.lastrun
-    ./node_modules/babel/bin/babel/index.js app --out-dir src --stage 1 --compact false > /dev/null
+    pkdir -p ./src
+    touch ./src/jest.lastrun
+    ./node_modules/.bin/babel app --out-dir src --stage 1 --compact false > /dev/null
 else
-    for i in `find app -type f -newer jest.lastrun`
+    for i in `find app -type f -newer ./src/jest.lastrun`
     do
-        ./node_modules/babel/bin/babel/index.js $i --out-file `echo $i | sed 's#^app#src#'`
+        ./node_modules/.bin/babel $i --out-file `echo $i | sed 's#^app#src#'`
     done
-    touch jest.lastrun
+    touch ./src/jest.lastrun
 fi
 
-./node_modules/jest-cli/bin/jest.js src/$1
+COMPILED=`echo $1 | sed 's/app\///g'`
+echo "node --debug node_modules/jest-cli/bin/jest.js --runInBand src/$COMPILED"
+node --debug node_modules/jest-cli/bin/jest.js --runInBand src/$COMPILED

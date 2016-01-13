@@ -3,7 +3,6 @@
 install:
 	@npm install
 	@./node_modules/protractor/bin/webdriver-manager update
-	mkdir -p examples/blog/build/
 	mv node_modules/react-medium-editor node_modules/react-medium-editor_es6
 	./node_modules/babel/bin/babel/index.js node_modules/react-medium-editor_es6 --out-dir node_modules/react-medium-editor --stage 1 --compact false > /dev/null
 	mv node_modules/admin-config node_modules/admin-config_es6
@@ -17,11 +16,10 @@ build:
 	@echo "Files build/react-admin.min.css and build/react-admin.min.js updated (with minification)"
 
 install-blog:
-	cd ./examples/blog && bower install && cd ../..
-	cp ./node_modules/babel-core/browser.min.js ./examples/blog/build/babel.min.js
+	cd ./examples/blog && make install
 
 run-blog:
-	@./node_modules/webpack-dev-server/bin/webpack-dev-server.js --progress --colors --hot --content-base examples/blog
+	cd ./examples/blog && make run
 
 start-test-server: test-server.PID
 
@@ -40,7 +38,7 @@ test-unit-clean:
 	rm -rf ./src
 
 test-unit-run:
-	@./node_modules/jest-cli/bin/jest.js src
+	@./node_modules/jest-cli/bin/jest.js --runInBand src
 
 test-unit: test-unit-init test-unit-run test-unit-clean
 
