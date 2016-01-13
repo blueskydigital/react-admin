@@ -33,6 +33,7 @@ ReferencedList.contextTypes = {
     configuration: React.PropTypes.object.isRequired
 };
 
-require('../../autoloader')('ReferencedList', ReferencedList);
+import register from '../../autoloader';
+register('ReferencedList', ReferencedList);
 
 export default ReferencedList;

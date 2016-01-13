@@ -44,6 +44,7 @@ ReferenceManyColumn.propTypes = {
     entry: React.PropTypes.object.isRequired
 };
 
-require('../../autoloader')('ReferenceManyColumn', ReferenceManyColumn);
+import register from '../../autoloader';
+register('ReferenceManyColumn', ReferenceManyColumn);
 
 export default ReferenceManyColumn;

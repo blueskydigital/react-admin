@@ -19,6 +19,7 @@ NumberColumn.propTypes = {
     detailAction: React.PropTypes.func
 };
 
-require('../../autoloader')('NumberColumn', NumberColumn);
+import register from '../../autoloader';
+register('NumberColumn', NumberColumn);
 
 export default NumberColumn;

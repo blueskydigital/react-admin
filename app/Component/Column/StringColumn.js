@@ -12,6 +12,4 @@ StringColumn.propTypes = {
     value: React.PropTypes.any
 };
 
-require('../../autoloader')('StringColumn', StringColumn);
-
 export default StringColumn;

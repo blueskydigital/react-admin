@@ -57,6 +57,7 @@ JsonColumn.propTypes = {
     ]).isRequired
 };
 
-require('../../autoloader')('JsonColumn', JsonColumn);
+import register from '../../autoloader';
+register('JsonColumn', JsonColumn);
 
 export default JsonColumn;
