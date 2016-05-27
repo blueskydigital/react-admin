@@ -14,6 +14,4 @@ BooleanColumn.propTypes = {
     value: React.PropTypes.any
 };
 
-require('../../autoloader')('BooleanColumn', BooleanColumn);
-
 export default BooleanColumn;

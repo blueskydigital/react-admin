@@ -1,7 +1,8 @@
 jest.autoMockOff();
 
+import RestWrapper from '../RestWrapper';
+
 describe('RestWrapper', function() {
-    var RestWrapper = require('../RestWrapper');
 
     describe('getList', function() {
         it('should return data in expected format', function() {

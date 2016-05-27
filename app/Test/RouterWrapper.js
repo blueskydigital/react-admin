@@ -1,6 +1,6 @@
-const React = require('react/addons');
-const RouterStub = require('./RouterStub');
-const ComponentWrapper = require('./ComponentWrapper');
+import React from 'react';
+import RouterStub from './RouterStub';
+import ComponentWrapper from './ComponentWrapper';
 
 function wrapComponent(cb) {
     const childContextTypes = {

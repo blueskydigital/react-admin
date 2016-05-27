@@ -1,5 +1,5 @@
-const React = require('react/addons');
-const TestUtils = React.addons.TestUtils;
+import React from 'react';
+import { shallow, mount, render } from 'enzyme';
 
 export default function ComponentWrapper(childContextTypes, childContext, cb) {
     const TestWrapper = React.createClass({
@@ -14,7 +14,7 @@ export default function ComponentWrapper(childContextTypes, childContext, cb) {
         }
     });
 
-    return TestUtils.renderIntoDocument(
+    return mount(
         <TestWrapper />
     );
 }

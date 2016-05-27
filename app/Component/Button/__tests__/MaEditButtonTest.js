@@ -1,41 +1,40 @@
-jest.autoMockOff();
-jest.setMock('react-router', {Link : require('../__mocks__/Link')});
+jest.disableAutomock();
+import React from 'react';
+import { shallow, mount, render } from 'enzyme';
+import MaEditButton from '../MaEditButton';
 
 describe('MaEditButton', () => {
-    const React = require('react/addons');
-    const TestUtils = React.addons.TestUtils;
-    const MaEditButton = require('../MaEditButton');
-
     let entry;
 
     beforeEach(() => {
         entry = {
-            identifierValue: 23
+            identifierValue: 24
         };
     });
 
     describe('With good props', () => {
         it('Should display label and size', () => {
-            let editButton = TestUtils.renderIntoDocument(<MaEditButton entityName={'MyEntity'} entry={entry} label={'Delete'} size={'xs'} />);
-            editButton = React.findDOMNode(editButton);
+            const wrapper = mount(
+              <MaEditButton entityName={'MyEntity'} entry={entry} label={'Delete'} size={'xs'} />
+            );
+            const editButton = wrapper.find('.btn').node;
 
             expect(editButton.className).toContain('btn btn-edit btn-default btn-xs');
             expect(editButton.innerHTML).toContain('Delete');
         });
 
-        it('Should redirect to the create route', () => {
-            let editButton = TestUtils.renderIntoDocument(<MaEditButton entityName={'MyEntity'} entry={entry} label={'Hello'} size={'xs'} />);
-            editButtonNode = React.findDOMNode(editButton);
+        it('Should redirect to the edit route', () => {
+            const wrapper = shallow(
+              <MaEditButton entityName={'MyEntity'} entry={entry} label={'Delete'} size={'xs'} />
+            );
+            const editButton = wrapper.find('.btn');
 
-            expect(editButtonNode.attributes['data-click-to'].value).toEqual('');
+            expect(editButton.props().to).toEqual('edit');
 
-            TestUtils.Simulate.click(editButtonNode);
+            wrapper.simulate('click');
 
-            expect(editButtonNode.attributes['data-click-to'].value).toEqual('edit');
-
-            const params = JSON.parse(editButtonNode.attributes['data-params'].value);
-            expect(params.entity).toEqual('MyEntity');
-            expect(params.id).toEqual(23);
+            expect(editButton.props().params.entity).toEqual('MyEntity');
+            expect(editButton.props().params.id).toEqual(24);
         });
     });
 });

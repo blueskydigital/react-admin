@@ -41,6 +41,4 @@ DatagridActions.propTypes = {
     size: React.PropTypes.string
 };
 
-require('../../autoloader')('DatagridActions', DatagridActions);
-
 export default DatagridActions;

@@ -35,6 +35,4 @@ FilterButton.propTypes = {
     showFilter: React.PropTypes.func
 };
 
-require('../../autoloader')('FilterButton', FilterButton);
-
 export default FilterButton;

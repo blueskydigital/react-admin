@@ -132,6 +132,4 @@ Datagrid.contextTypes = {
     configuration: React.PropTypes.object
 };
 
-require('../../autoloader')('Datagrid', Datagrid);
-
 export default Datagrid;

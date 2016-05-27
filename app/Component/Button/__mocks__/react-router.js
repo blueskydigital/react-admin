@@ -1,4 +1,4 @@
-const React = require('react/react');
+import React from 'react';
 
 class Link extends React.Component {
     constructor() {
@@ -18,8 +18,12 @@ class Link extends React.Component {
         });
     }
     render() {
-        return <a className={this.props.className} data-click-to={this.state.clickedTo} data-params={this.state.params} data-query={this.state.query} onClick={this.click.bind(this)}>{this.props.children}</a>
+        return <a className={this.props.className} data-click-to={this.state.clickedTo}
+          data-params={this.state.params} data-query={this.state.query}
+          onClick={this.click.bind(this)}>{this.props.children}</a>
     }
 }
 
-export default Link;
+export {
+  Link
+};

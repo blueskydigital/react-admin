@@ -14,6 +14,8 @@ const Components = {
     Link, React
 };
 
+// TODO: use https://github.com/bigpipe/react-jsx ?
+
 class Compile extends React.Component {
     evalInContext(template, context) {
         let variables = [];
@@ -28,6 +30,8 @@ class Compile extends React.Component {
             }
             // code string to eval
             args.push(`return ${jsx.fromString(template, context)};`);
+
+            // console.log(args);
 
             // code will be executed in an isolated scope
             template = Function.apply(null, args);
@@ -45,20 +49,20 @@ class Compile extends React.Component {
     }
 
     render() {
-        let compiledElement = React.cloneElement(this);
 
-        let props = compiledElement.props || {};
-        props.factory = 'this.createElement';
-        props.passUnknownTagsToFactory = true;
-        props.createElement = React.createElement;
+        let props = {
+          factory: 'this.createElement',
+          passUnknownTagsToFactory: true,
+          createElement: React.createElement
+        };
 
-        if (!props || !props.children) {
+        let children = this.props.children;
+
+        if (!children) {
             return null;
         }
 
         // Avoid string without root element
-        let children = props.children;
-
         if (Array.isArray(children)) {
             children = children.join('');
         }
@@ -72,7 +76,7 @@ class Compile extends React.Component {
             }
 
             // Import components into context
-            props = objectAssign(props, Components);
+            props = objectAssign(props, Components, this.props);
             props.props = this.props;
 
             return this.evalInContext.apply(props, [children, props]);
@@ -81,7 +85,5 @@ class Compile extends React.Component {
         return children;
     }
 }
-
-require('../autoloader')('Compile', Compile);
 
 export default Compile;

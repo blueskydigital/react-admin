@@ -1,13 +1,11 @@
-jest.autoMockOff();
+jest.disableAutomock();
+import React from 'react';
+import { Link } from 'react-router';
+import { shallow, mount, render } from 'enzyme';
+import ViewActions from '../ViewActions';
+
 
 describe('ViewActions', () => {
-    const React = require('react/addons');
-    const ViewActions = require('../ViewActions');
-    const routerWrapper = require('../../Test/RouterWrapper');
-
-    function getActions(buttons, entry, view) {
-        return routerWrapper(() => <ViewActions buttons={buttons} entry={entry} entityName={view.entity.name()} />);
-    }
 
     let view;
     let entry;
@@ -25,13 +23,14 @@ describe('ViewActions', () => {
 
     describe('With buttons prop', () => {
         it('Should display desired buttons', () => {
-            let viewActions = getActions(['back', 'delete'], entry, view);
-            viewActions = React.findDOMNode(viewActions);
+            let viewActions = mount(
+              <ViewActions buttons={['back', 'delete']} entry={entry} entityName={view.entity.name()} />
+            );
 
-            const buttons = viewActions.querySelectorAll('.btn');
+            // console.log(viewActions.debug());
 
-            expect(buttons[0].innerHTML).toContain('Back');
-            expect(buttons[1].innerHTML).toContain('Delete');
+            expect(viewActions.find('.btn-back').text()).toContain('Back');
+            expect(viewActions.find('.btn-delete').text()).toContain('Delete');
         });
     });
 });

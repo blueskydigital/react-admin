@@ -1,5 +1,5 @@
 import React from 'react';
-const Upload = require('rc-upload');
+import Upload from 'rc-upload';
 
 class FileField extends React.Component {
     constructor(props, context) {
@@ -128,7 +128,5 @@ FileField.propTypes = {
     value: React.PropTypes.any,
     updateField: React.PropTypes.func
 };
-
-require('../../autoloader')('FileField', FileField);
 
 export default FileField;

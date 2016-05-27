@@ -33,16 +33,8 @@ stop-test-server: test-server.PID
 
 run-test-e2e: start-test-server test-e2e stop-test-server
 
-test-unit-init:
-	./node_modules/.bin/babel app --out-dir src --stage 1 --compact false > /dev/null
-
-test-unit-clean:
-	rm -rf ./src
-
-test-unit-run:
-	@./node_modules/jest-cli/bin/jest.js src
-
-test-unit: test-unit-init test-unit-run test-unit-clean
+test-unit:
+	@./node_modules/.bin/jest
 
 test-e2e:
 	@./node_modules/.bin/protractor protractor.conf.js

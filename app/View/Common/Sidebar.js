@@ -22,6 +22,4 @@ Sidebar.propTypes = {
     menuViews: React.PropTypes.object.isRequired
 };
 
-require('../../autoloader')('Sidebar', Sidebar);
-
 export default Sidebar;

@@ -1,17 +1,20 @@
-jest.autoMockOff();
+jest.disableAutomock();
+import React from 'react';
+import { shallow, mount, render } from 'enzyme';
+import MaBackButton from '../MaBackButton';
 
 describe('MaBackButton', () => {
-    const React = require('react/addons');
-    const TestUtils = React.addons.TestUtils;
-    const MaBackButton = require('../MaBackButton');
 
     describe('With good props', () => {
         it('Should display label and size', () => {
-            var backButton = TestUtils.renderIntoDocument(<MaBackButton label={'Hello'} size={'xs'} />);
-            backButton = React.findDOMNode(backButton);
 
-            expect(backButton.className).toContain('btn-xs');
-            expect(backButton.innerHTML).toContain('Hello');
+            const wrapper = mount(
+              <MaBackButton label={'Hello'} size={'xs'} />
+            );
+            const button = wrapper.find('.btn').node;
+
+            expect(button.className).toContain('btn-xs');
+            expect(button.innerHTML).toContain('Hello');
         });
     });
 });

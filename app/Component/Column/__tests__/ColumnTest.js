@@ -1,24 +1,27 @@
-jest.autoMockOff();
+jest.disableAutomock();
+import React from 'react';
+import { shallow, mount, render } from 'enzyme';
+
+import Field from 'admin-config/lib/Field/Field';
+import NumberField from 'admin-config/lib/Field/NumberField';
+import Entity from 'admin-config/lib/Entity/Entity';
+import StringFieldView from '../../../Field/StringFieldView';
+import NumberFieldView from '../../../Field/NumberFieldView';
+import FieldViewConfiguration from '../../../Field/FieldViewConfiguration';
+
+import Column from '../Column';
 
 describe('Column', () => {
-    const React = require('react/addons');
-    const TestUtils = React.addons.TestUtils;
-    const Column = require('../Column');
-    const Field = require('admin-config/lib/Field/Field');
-    const NumberField = require('admin-config/lib/Field/NumberField');
-    const Entity = require('admin-config/lib/Entity/Entity');
-    const FieldViewConfiguration = require('../../../Field/FieldViewConfiguration');
-    const StringFieldView = require('../../../Field/StringFieldView');
-    const NumberFieldView = require('../../../Field/NumberFieldView');
 
     FieldViewConfiguration.registerFieldView('string', StringFieldView);
     FieldViewConfiguration.registerFieldView('number', NumberFieldView);
 
     function getColumn(field, entity, entry, dataStore, configuration) {
-        const col = TestUtils.renderIntoDocument(<Column field={field} entity={entity} entry={entry}
-                                                             dataStore={dataStore} configuration={configuration} />);
-
-        return React.findDOMNode(col);
+        const wrapper = mount(
+          <Column field={field} entity={entity} entry={entry}
+                  dataStore={dataStore} configuration={configuration} />
+        );
+        return wrapper;
     }
 
 
@@ -30,10 +33,9 @@ describe('Column', () => {
                 'name': 'my posts #1'
             }
         };
-
         const col = getColumn(field, entity, entry);
 
-        expect(col.innerHTML).toEqual('my posts #1');
+        expect(col.text()).toEqual('my posts #1');
     });
 
     it('should display a string field with a link', () => {
@@ -44,12 +46,9 @@ describe('Column', () => {
                 'count': 123
             }
         };
-
         field.isDetailLink(true);
-
         const col = getColumn(field, entity, entry);
 
-        expect(col.tagName.toLowerCase()).toEqual('a');
-        expect(col.querySelector('span').innerHTML).toEqual('123');
+        expect(col.find('a span').text()).toEqual('123');
     });
 });

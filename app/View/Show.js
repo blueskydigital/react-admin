@@ -121,6 +121,4 @@ ShowView.contextTypes = {
     configuration: React.PropTypes.object.isRequired
 };
 
-require('../autoloader')('ShowView', ShowView);
-
 export default ShowView;

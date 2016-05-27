@@ -52,6 +52,4 @@ SelectField.propTypes = {
     updateField: React.PropTypes.func
 };
 
-require('../../autoloader')('SelectField', SelectField);
-
 export default SelectField;

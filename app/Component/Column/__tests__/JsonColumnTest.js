@@ -1,46 +1,45 @@
-jest.autoMockOff();
+jest.disableAutomock();
+import React from 'react';
+import { Link } from 'react-router';
+import { shallow, mount, render } from 'enzyme';
+
+import JsonColumn from '../JsonColumn';
+
 
 describe('JsonColumn', () => {
-    let React, TestUtils, JsonColumn;
-
-    beforeEach(() => {
-        React = require('react/addons');
-        TestUtils = React.addons.TestUtils
-        JsonColumn = require('../JsonColumn');
-    });
 
     it('should display an array of literals', () => {
-        let jsonColumn = TestUtils.renderIntoDocument(<JsonColumn value={['abc', 123]}/>);
-        jsonColumn = React.findDOMNode(jsonColumn);
-
-        expect(jsonColumn.querySelector('table').getAttribute('class')).toBe('table table-condensed');
-        expect(jsonColumn.querySelector('tr:first-child td').innerHTML).toBe('abc');
-        expect(jsonColumn.querySelector('tr:last-child td').innerHTML).toBe('123');
+        const wrapper = shallow(
+          <JsonColumn value={['abc', 123]}/>
+        );
+        expect(wrapper.find('table').props().className).toBe('table table-condensed');
+        expect(wrapper.find('tr').first().find('td').text()).toBe('abc');
+        expect(wrapper.find('tr').last().find('td').text()).toBe('123');
     });
 
     it('should display an object of literals', () => {
-        let jsonColumn = TestUtils.renderIntoDocument(<JsonColumn value={{title1: 'name1', title2: 'name2'}}/>);
-        jsonColumn = React.findDOMNode(jsonColumn);
+        const wrapper = shallow(
+          <JsonColumn value={{title1: 'name1', title2: 'name2'}}/>
+        );
 
-        expect(jsonColumn.querySelector('table').getAttribute('class')).toBe('table table-condensed table-bordered');
-        expect(jsonColumn.querySelector('tr:first-child th').innerHTML).toBe('title1');
-        expect(jsonColumn.querySelector('tr:first-child td').innerHTML).toBe('name1');
-
-        expect(jsonColumn.querySelector('tr:last-child th').innerHTML).toBe('title2');
-        expect(jsonColumn.querySelector('tr:last-child td').innerHTML).toBe('name2');
+        expect(wrapper.find('table').props().className).toBe('table table-condensed table-bordered');
+        expect(wrapper.find('tr').first().find('th').text()).toBe('title1');
+        expect(wrapper.find('tr').first().find('td').text()).toBe('name1');
+        expect(wrapper.find('tr').last().find('th').text()).toBe('title2');
+        expect(wrapper.find('tr').last().find('td').text()).toBe('name2');
     });
 
     it('should display a mix of array and objects', () => {
-        let jsonColumn = TestUtils.renderIntoDocument(<JsonColumn value={[123, {test1: 'value1'}]}/>);
-        jsonColumn = React.findDOMNode(jsonColumn);
+        const wrapper = mount(
+          <JsonColumn value={[123, {test1: 'value1'}]}/>
+        );
 
-        expect(jsonColumn.querySelector('table:first-child').getAttribute('class')).toBe('table table-condensed');
-        expect(jsonColumn.querySelector('tr:first-child td').innerHTML).toBe('123');
+        expect(wrapper.find('table').first().props().className).toBe('table table-condensed');
+        expect(wrapper.find('tr').first().find('td').text()).toBe('123');
 
-        const table2 = jsonColumn.querySelector('table table');
-
-        expect(table2.getAttribute('class')).toBe('table table-condensed table-bordered');
-        expect(table2.querySelector('th').innerHTML).toBe('test1');
-        expect(table2.querySelector('td').innerHTML).toBe('value1');
+        const table2 = wrapper.find('td table');
+        expect(table2.props().className).toBe('table table-condensed table-bordered');
+        expect(table2.find('th').text()).toBe('test1');
+        expect(table2.find('td').text()).toBe('value1');
     });
 });

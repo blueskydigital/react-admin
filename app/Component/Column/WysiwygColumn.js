@@ -12,6 +12,4 @@ WysiwygColumn.propTypes = {
     value: React.PropTypes.any
 };
 
-require('../../autoloader')('WysiwygColumn', WysiwygColumn);
-
 export default WysiwygColumn;

@@ -20,6 +20,4 @@ Header.propTypes = {
     title: React.PropTypes.string.isRequired
 };
 
-require('../../autoloader')('Header', Header);
-
 export default Header;

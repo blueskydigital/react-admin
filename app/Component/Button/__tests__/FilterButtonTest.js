@@ -1,14 +1,13 @@
-jest.autoMockOff();
+jest.disableAutomock();
+import React from 'react';
+import { shallow, mount, render } from 'enzyme';
+import { List } from 'immutable'
+import Field from 'admin-config/lib/Field/Field';
+import FieldViewConfiguration from '../../../Field/FieldViewConfiguration';
+import StringFieldView from '../../../Field/StringFieldView';
+import FilterButton from '../FilterButton';
 
 describe('FieldButton', () => {
-    const { List } = require('immutable');
-    const React = require('react/addons');
-    const TestUtils = React.addons.TestUtils;
-    const FilterButton = require('../FilterButton');
-    const Field = require('admin-config/lib/Field/Field');
-
-    const FieldViewConfiguration = require('../../../Field/FieldViewConfiguration');
-    const StringFieldView = require('../../../Field/StringFieldView');
 
     FieldViewConfiguration.registerFieldView('string', StringFieldView);
 
@@ -22,24 +21,22 @@ describe('FieldButton', () => {
 
     describe('With good props', () => {
         it('Should display label and default size', () => {
-            let filterButton = TestUtils.renderIntoDocument(<FilterButton filters={List([filter])} showFilter={showFilter} />);
-            filterButton = React.findDOMNode(filterButton);
+            const wrapper = mount(
+              <FilterButton filters={List([filter])} showFilter={showFilter} />
+            );
+            const title = wrapper.find('DropdownButton span').first();
+            expect(title.html()).toContain('Add filters');
 
-            expect(filterButton.className).toEqual('btn-group');
-
-            const filterButtonButton = filterButton.querySelector('button');
-
-            expect(filterButtonButton.type).toEqual('button');
-            expect(filterButtonButton.className).toEqual('dropdown-toggle btn btn-default');
-            expect(filterButtonButton.innerHTML).toContain('Add filters');
+            const filterButtonButton = wrapper.find('DropdownButton button');
+            expect(filterButtonButton.type()).toEqual('button');
+            expect(filterButtonButton.props().className).toEqual('dropdown-toggle btn btn-default');
         });
 
         it('Should call showFilter callback', () => {
-            let filterButton = TestUtils.renderIntoDocument(<FilterButton filters={List([filter])} showFilter={showFilter} />);
-            filterButton = React.findDOMNode(filterButton);
-
-            const unselectedFilter = filterButton.querySelector('.dropdown-menu a');
-            TestUtils.Simulate.click(unselectedFilter);
+            const wrapper = mount(
+              <FilterButton filters={List([filter])} showFilter={showFilter} />
+            );
+            wrapper.find('.dropdown-menu a').simulate('click');
 
             expect(showned).toEqual(['note']);
         });

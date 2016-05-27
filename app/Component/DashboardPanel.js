@@ -40,6 +40,4 @@ DashboardPanel.propTypes = {
     sortField: React.PropTypes.string
 };
 
-require('../autoloader')('DashboardPanel', DashboardPanel);
-
 export default DashboardPanel;

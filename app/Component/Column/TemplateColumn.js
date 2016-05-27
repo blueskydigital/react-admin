@@ -24,6 +24,4 @@ TemplateColumn.propTypes = {
     entry: React.PropTypes.object
 };
 
-require('../../autoloader')('TemplateColumn', TemplateColumn);
-
 export default TemplateColumn;

@@ -172,6 +172,4 @@ EditView.contextTypes = {
     configuration: React.PropTypes.object.isRequired
 };
 
-require('../autoloader')('EditView', EditView);
-
 export default EditView;

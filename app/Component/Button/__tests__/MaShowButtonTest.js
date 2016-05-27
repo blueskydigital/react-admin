@@ -1,15 +1,12 @@
-jest.autoMockOff();
-jest.setMock('react-router', {Link : require('../__mocks__/Link')});
+jest.disableAutomock();
+import React from 'react';
+import { shallow, mount, render } from 'enzyme';
+import MaShowButton from '../MaShowButton';
 
 describe('MaShowButton', () => {
-    const React = require('react/addons');
-    const TestUtils = React.addons.TestUtils;
-    const MaShowButton = require('../MaShowButton');
-
     let entry;
 
     beforeEach(() => {
-
         entry = {
             identifierValue: 23
         };
@@ -17,26 +14,27 @@ describe('MaShowButton', () => {
 
     describe('With good props', () => {
         it('Should display label and default size', () => {
-            let showButton = TestUtils.renderIntoDocument(<MaShowButton entityName={'MyEntity'} entry={entry} label={'Show'} size={'xs'} />);
-            showButton = React.findDOMNode(showButton);
+            const wrapper = mount(
+              <MaShowButton entityName={'MyEntity'} entry={entry} label={'Show'} size={'xs'} />
+            );
+            const button = wrapper.find('.btn').node;
 
-            expect(showButton.className).toEqual('btn btn-show btn-default btn-xs');
-            expect(showButton.innerHTML).toContain('Show');
+            expect(button.className).toEqual('btn btn-show btn-default btn-xs');
+            expect(button.innerHTML).toContain('Show');
         });
 
-        it('Should redirect to the create route', () => {
-            const showButton = TestUtils.renderIntoDocument(<MaShowButton entityName={'MyEntity'} entry={entry} label={'Hello'} size={'xs'} />);
-            const showButtonNode = React.findDOMNode(showButton);
+        it('Should redirect to the show route', () => {
+            const wrapper = shallow(
+              <MaShowButton entityName={'MyEntity'} entry={entry} label={'Hello'} />
+            );
+            const button = wrapper.find('.btn');
 
-            expect(showButtonNode.attributes['data-click-to'].value).toEqual('');
+            expect(button.props().to).toEqual('show');
 
-            TestUtils.Simulate.click(showButtonNode);
+            wrapper.simulate('click');
 
-            expect(showButtonNode.attributes['data-click-to'].value).toEqual('show');
-
-            const params = JSON.parse(showButtonNode.attributes['data-params'].value);
-            expect(params.entity).toEqual('MyEntity');
-            expect(params.id).toEqual(23);
+            expect(button.props().params.entity).toEqual('MyEntity');
+            expect(button.props().params.id).toEqual(23);
         });
     });
 });

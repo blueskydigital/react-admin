@@ -6,8 +6,8 @@ class MaCreateButton extends React.Component {
         const size = this.props.size ? ` btn-${this.props.size}` : '';
         const className = `btn btn-create btn-default${size}`;
         const params = {
-                entity: this.props.entityName
-            };
+            entity: this.props.entityName
+        };
 
         return (
             <Link className={className} to="create" params={params}>
@@ -22,7 +22,5 @@ MaCreateButton.propTypes = {
     size: React.PropTypes.string,
     label: React.PropTypes.string
 };
-
-require('../../autoloader')('MaCreateButton', MaCreateButton);
 
 export default MaCreateButton;

@@ -53,6 +53,4 @@ JsonField.propTypes = {
     updateField: React.PropTypes.func
 };
 
-require('../../autoloader')('JsonField', JsonField);
-
 export default JsonField;

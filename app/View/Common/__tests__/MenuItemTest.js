@@ -1,11 +1,14 @@
-jest.autoMockOff();
-jest.setMock('react-router', { Link: require('../../../Component/Button/__mocks__/Link') });
+jest.disableAutomock();
+jest.mock('react-router');
+
+import React from 'react';
+import { shallow, mount, render } from 'enzyme';
+import Entry from 'admin-config/lib/Entry';
+import routerWrapper from '../../../Test/RouterWrapper';
+
+import MenuItem from '../MenuItem';
 
 describe('MenuItem', () => {
-    const React = require('react/addons');
-    const TestUtils = React.addons.TestUtils;
-    const MenuItem = require('../MenuItem');
-    const routerWrapper = require('../../../Test/RouterWrapper');
 
     function getMenuItem(menu) {
         return routerWrapper(() => {
@@ -32,16 +35,16 @@ describe('MenuItem', () => {
         it('Should display desired menu', () => {
             let menu = getMenu('Post', '/posts/list', [], null, true);
             let menuItem = getMenuItem(menu);
-            menuItem = React.findDOMNode(menuItem);
 
-            let link = menuItem.querySelector('a');
-            let icons = menuItem.querySelectorAll('.glyphicon-list');
-            TestUtils.Simulate.click(link);
-
+            let icons = menuItem.find('.glyphicon-list');
             expect(icons.length).toEqual(1);
-            expect(menuItem.className).toContain('active');
-            expect(link.attributes['data-click-to'].value).toEqual('/posts/list');
-            expect(link.innerHTML).toContain('Post');
+
+            let link = menuItem.find('Link');
+            link.simulate('click');
+
+            expect(menuItem.find('li').props().className).toContain('active');
+            expect(link.node.state.clickedTo).toEqual('/posts/list');
+            expect(link.text()).toContain('Post');
         });
     });
 
@@ -51,17 +54,16 @@ describe('MenuItem', () => {
             let child2 = getMenu('Comment', '/posts/list', [], null, false);
             let menu = getMenu('Blog', null, [child1, child2], null, false, true);
             let menuItem = getMenuItem(menu);
-            menuItem = React.findDOMNode(menuItem);
 
-            let arrow = menuItem.querySelector('.arrow');
-            let childrenContainer = menuItem.querySelector('.nav-second-level');
-            let childNodes = menuItem.querySelectorAll('ul li');
+            let arrow = menuItem.find('.arrow');
+            let childrenContainer = menuItem.find('.nav-second-level');
+            let childNodes = menuItem.find('ul li');
 
-            expect(arrow.className).toContain('glyphicon-menu-down');
+            expect(arrow.props().className).toContain('glyphicon-menu-down');
             expect(childrenContainer).toBeTruthy();
 
-            expect(childNodes[0].innerHTML).toContain('Post');
-            expect(childNodes[1].innerHTML).toContain('Comment');
+            expect(childNodes.at(0).text()).toContain('Post');
+            expect(childNodes.at(1).text()).toContain('Comment');
         });
     });
 });

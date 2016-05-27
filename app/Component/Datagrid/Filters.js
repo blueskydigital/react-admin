@@ -80,6 +80,4 @@ Filters.contextTypes = {
     configuration: React.PropTypes.object.isRequired
 };
 
-require('../../autoloader')('Filters', Filters);
-
 export default Filters;

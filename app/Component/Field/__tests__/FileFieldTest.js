@@ -1,12 +1,14 @@
-jest.autoMockOff();
-jest.mock('rc-upload/lib/IframeUploader', jest.genMockFromModule('rc-upload/lib/IframeUploader'));
+jest.disableAutomock();
+jest.mock('rc-upload/lib/IframeUploader');
+
+import React from 'react';
+import { shallow, mount, render } from 'enzyme';
+import AdminFileField from 'admin-config/lib/Field/FileField';
+import IframeUploader from 'rc-upload/lib/IframeUploader';
+
+import FileField from '../FileField';
 
 describe('FileField', () => {
-    const React = require('react/addons');
-    const TestUtils = React.addons.TestUtils;
-    const AdminFileField = require('admin-config/lib/Field/FileField');
-    const FileField = require('../FileField');
-    const IframeUploader = require('rc-upload/lib/IframeUploader');
 
     let values = {};
     const onChange = (name, value) => { values[name] = value; };
@@ -23,10 +25,12 @@ describe('FileField', () => {
             apifilename: 'name'
         });
 
-        const instance = TestUtils.renderIntoDocument(<FileField name="my_field" field={field} value={null} updateField={onChange}/>);
-        const upload = TestUtils.findRenderedComponentWithType(instance, IframeUploader);
+        var ffield = shallow(
+          <FileField name="my_field" field={field} value={null} updateField={onChange}/>
+        );
+        const upload = ffield.find('Upload');
 
-        upload.props.onSuccess('{ "name": "my-cat.jpeg" }', { name: 'cat.jpg' });
+        upload.props().onSuccess('{ "name": "my-cat.jpeg" }', { name: 'cat.jpg' });
 
         jest.clearAllTimers(); // to avoid waiting for the end of setTimout calls
 

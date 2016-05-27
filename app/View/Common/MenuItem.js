@@ -108,6 +108,4 @@ MenuItem.propTypes = {
     menu: React.PropTypes.object.isRequired
 };
 
-require('../../autoloader')('MenuItem', MenuItem);
-
 export default MenuItem;

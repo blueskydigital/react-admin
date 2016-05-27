@@ -136,3 +136,11 @@ Run only one unit test by calling, for example:
 ```
 ./test-unit-single.sh __tests__/autoloaderTest.js
 ```
+
+## Debugging
+
+Run node with --debug-brk and JEST cli main module with runInBand param:
+
+```
+node --debug-brk ./node_modules/jest-cli/bin/jest.js --runInBand
+```

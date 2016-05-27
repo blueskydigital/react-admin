@@ -23,6 +23,4 @@ MaListButton.propTypes = {
     label: React.PropTypes.string
 };
 
-require('../../autoloader')('MaListButton', MaListButton);
-
 export default MaListButton;

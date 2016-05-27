@@ -35,6 +35,4 @@ class NotFoundView extends React.Component {
     }
 }
 
-require('../autoloader')('NotFoundView', NotFoundView);
-
 export default NotFoundView;

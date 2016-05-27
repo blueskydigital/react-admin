@@ -1,12 +1,32 @@
-jest.autoMockOff();
-jest.setMock('react-router', { Link: require('../../Button/__mocks__/Link') });
+jest.disableAutomock();
+jest.mock('react-router');
+
+import React from 'react';
+import { shallow, mount, render } from 'enzyme';
+
+import Entity from 'admin-config/lib/Entity/Entity';
+import Entry from 'admin-config/lib/Entry';
+import NumberField from 'admin-config/lib/Field/NumberField';
+import Field from 'admin-config/lib/Field/Field';
+import DateField from 'admin-config/lib/Field/DateField';
+import ListView from 'admin-config/lib/View/ListView';
+
+import FieldViewConfiguration from '../../../Field/FieldViewConfiguration';
+import StringFieldView from '../../../Field/StringFieldView';
+import NumberFieldView from '../../../Field/NumberFieldView';
+import DateFieldView from '../../../Field/DateFieldView';
+
+import RouterStub from '../../../Test/RouterStub';
+import ComponentWrapper from '../../../Test/ComponentWrapper';
+
+import Datagrid from '../Datagrid';
+
 
 describe('Datagrid', () => {
-    const React = require('react/addons');
-    const TestUtils = React.addons.TestUtils;
-    const Datagrid = require('../Datagrid');
-    const RouterStub = require('../../../Test/RouterStub');
-    const ComponentWrapper = require('../../../Test/ComponentWrapper');
+
+    FieldViewConfiguration.registerFieldView('string', StringFieldView);
+    FieldViewConfiguration.registerFieldView('number', NumberFieldView);
+    FieldViewConfiguration.registerFieldView('date', DateFieldView);
 
     function wrapComponent(configuration, cb) {
         const childContextTypes = {
@@ -21,24 +41,9 @@ describe('Datagrid', () => {
         return ComponentWrapper(childContextTypes, childContext, cb);
     }
 
-    const ListView = require('admin-config/lib/View/ListView');
-    const Entry = require('admin-config/lib/Entry');
-    const Entity = require('admin-config/lib/Entity/Entity');
-    const NumberField = require('admin-config/lib/Field/NumberField');
-    const Field = require('admin-config/lib/Field/Field');
-    const DateField = require('admin-config/lib/Field/DateField');
-
-    const FieldViewConfiguration = require('../../../Field/FieldViewConfiguration');
-    const StringFieldView = require('../../../Field/StringFieldView');
-    const NumberFieldView = require('../../../Field/NumberFieldView');
-    const DateFieldView = require('../../../Field/DateFieldView');
-
-    FieldViewConfiguration.registerFieldView('string', StringFieldView);
-    FieldViewConfiguration.registerFieldView('number', NumberFieldView);
-    FieldViewConfiguration.registerFieldView('date', DateFieldView);
-
     let sorted = {};
     const onSort = (name, dir) => {
+        sorted = {};
         sorted[name] = dir;
     };
 
@@ -83,19 +88,21 @@ describe('Datagrid', () => {
     describe('Column headers', () => {
         it('should set header with correct label for each field', () => {
             let datagrid = getDatagrid('myView', 'myEntity', fields, view, router, [], null, null);
-            datagrid = React.findDOMNode(datagrid);
+            let headers = datagrid.find('thead th');
 
-            const headers = [].slice.call(datagrid.querySelectorAll('thead th')).map(h => h.textContent);
-            expect(headers).toEqual(['#', 'Title', 'Creation date']);
+            expect(headers.at(0).text()).toEqual('#');
+            expect(headers.at(1).text()).toEqual('Title');
+            expect(headers.at(2).text()).toEqual('Creation date');
         });
 
         it('should send `sort` event to datagrid when clicking on header', () => {
             const datagrid = getDatagrid('myView', 'myEntity', fields, view, router, [], null, null);
-            const datagridNode = React.findDOMNode(datagrid);
-            const header = datagridNode.querySelector('thead th a');
-            TestUtils.Simulate.click(header);
 
+            datagrid.find('thead th a').at(0).simulate('click');  // click on ID header
             expect(sorted).toEqual({ 'myView.id': 'ASC' });
+
+            datagrid.find('thead th a').at(2).simulate('click');  // click on Creation date header
+            expect(sorted).toEqual({ 'myView.created_at': 'ASC' });
         });
     });
 
@@ -104,46 +111,42 @@ describe('Datagrid', () => {
             const entries = [
                 new Entry('posts', { 'id': 1, 'title': 'First Post', 'created_at': '2015-05-27' }, 1),
                 new Entry('posts', { 'id': 2, 'title': 'Second Post', 'created_at': '2015-05-28' }, 2),
-                new Entry('posts', { 'id': 3, 'title': 'Third Post', 'created_at': '2015-05-29' }, 3)
+                new Entry('posts', { 'id': 3, 'title': 'Third Post', 'created_at': '2015-05-29' }, 3),
+                new Entry('posts', { 'id': 44, 'title': '44th Post', 'created_at': '2016-05-29' }, 44)
             ];
 
             const datagrid = getDatagrid('myView', 'myEntity', fields, view, router, entries);
-            const datagridNode = React.findDOMNode(datagrid);
-            const rows = datagridNode.querySelectorAll('tbody tr');
+            const rows = datagrid.find('tbody tr');
 
-            expect(rows.length).toEqual(3);
-            expect(rows[0].childNodes.length).toEqual(3);
-            expect(rows[0].childNodes[1].textContent).toEqual('First Post');
-            expect(rows[2].childNodes[2].textContent).toEqual('2015-05-29');
+            expect(rows.length).toEqual(4);
+            expect(rows.at(0).children().length).toEqual(3);
+
+            expect(rows.at(0).find('td').at(1).text()).toEqual('First Post');
+            expect(rows.at(2).find('td').at(2).text()).toEqual('2015-05-29');
+            expect(rows.at(3).find('td').at(1).text()).toEqual('44th Post');
         });
 
          it('should set rows with correct values, plus action buttons', () => {
             const entries = [
                 new Entry('posts', { 'id': 1, 'title': 'First Post', 'created_at': '2015-05-27' }, 1)
             ];
-
             view = view.listActions(['edit']);
-
             const datagrid = getDatagrid('myView', 'myEntity', fields, view, router, entries);
-            const datagridNode = React.findDOMNode(datagrid);
-            const cells = datagridNode.querySelectorAll('tbody tr td');
+            const cells = datagrid.find('tbody tr td');
 
-            expect(cells.length).toEqual(4);
-            expect(cells[3].textContent).toContain('Edit');
+            expect(cells.length).toEqual(4);  // 3 + actions buttons
+            expect(cells.at(3).text()).toContain('Edit');
         });
 
-        it('should set rows with correct values, plus action buttons', () => {
+        it('should set make editable link from id cell', () => {
             const entries = [
                 new Entry('posts', { 'id': 1, 'title': 'First Post', 'created_at': '2015-05-27' }, 1)
             ];
-
             view = view.listActions(['edit']);
-
             const datagrid = getDatagrid('myView', 'myEntity', fields, view, router, entries, null, null);
-            const datagridNode = React.findDOMNode(datagrid);
-            const detailLink = datagridNode.querySelector('tbody tr:nth-child(1) td:nth-child(2) a');
+            const cells = datagrid.find('tbody tr td');
 
-            expect(detailLink.tagName.toLowerCase()).toBe('a');
+            expect(cells.find('a').at(0).text()).toBe('1'); // id
         });
     });
 });

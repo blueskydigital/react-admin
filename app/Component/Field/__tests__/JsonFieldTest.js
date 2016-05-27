@@ -1,27 +1,24 @@
-jest.autoMockOff();
+jest.disableAutomock();
+import React from 'react';
+import { shallow, mount, render } from 'enzyme';
+
+import JsonField from '../JsonField';
 
 describe('JsonField', () => {
-    const React = require('react/addons');
-    const TestUtils = React.addons.TestUtils;
-    const JsonField = require('../JsonField');
-    const Codemirror = require('react-codemirror');
-
     let values = {};
     const onChange = (name, value) => { values[name] = value; };
 
     it('should get a code mirror field with correct props and state', () => {
         const value = 'var code;';
-        const instance = TestUtils.renderIntoDocument(<JsonField name="my_field" value={value} updateField={onChange}/>);
-        const editor = TestUtils.findRenderedComponentWithType(instance, Codemirror);
+        const updatedValue = 'var code = 1;';
+        const field = shallow(
+          <JsonField name="my_field" value={value} updateField={onChange}/>
+        );
 
-        expect(editor.props.value).toBe(value);
+        expect(field.props().value).toBe(value);
 
-        editor.codemirrorValueChanged({
-            getValue: () => {
-                return 'var code = 1;';
-            }
-        });
+        field.props().onChange(updatedValue);
 
-        expect(values).toEqual({ 'my_field': 'var code = 1;' });
+        expect(values).toEqual({ 'my_field': updatedValue });
     });
 });

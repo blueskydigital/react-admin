@@ -1,10 +1,9 @@
-jest.autoMockOff();
-jest.setMock('react-router', { Link : require('../__mocks__/Link') });
+jest.disableAutomock();
+import React from 'react';
+import { shallow, mount, render } from 'enzyme';
+import MaDeleteButton from '../MaDeleteButton';
 
 describe('MaDeleteButton', () => {
-    const React = require('react/addons');
-    const TestUtils = React.addons.TestUtils;
-    const MaDeleteButton = require('../MaDeleteButton');
 
     let entry;
 
@@ -16,26 +15,27 @@ describe('MaDeleteButton', () => {
 
     describe('With good props', () => {
         it('Should display label and size', () => {
-            let deleteButton = TestUtils.renderIntoDocument(<MaDeleteButton entityName={'MyEntity'} entry={entry} label={'Delete'} size={'xs'} />);
-            deleteButton = React.findDOMNode(deleteButton);
+            const wrapper = mount(
+              <MaDeleteButton entityName={'MyEntity'} entry={entry} label={'Delete'} size={'xs'} />
+            );
+            const deleteButton = wrapper.find('.btn').node;
 
             expect(deleteButton.className).toContain('btn btn-delete btn-default btn-xs');
             expect(deleteButton.innerHTML).toContain('Delete');
         });
 
         it('Should redirect to the create route', () => {
-            let deleteButton = TestUtils.renderIntoDocument(<MaDeleteButton entityName={'MyEntity'} entry={entry} label={'Hello'} size={'xs'} />);
-            let deleteButtonNode = React.findDOMNode(deleteButton);
+            const wrapper = shallow(
+              <MaDeleteButton entityName={'MyEntity'} entry={entry} label={'Delete'} size={'xs'} />
+            );
+            const deleteButton = wrapper.find('.btn');
 
-            expect(deleteButtonNode.attributes['data-click-to'].value).toEqual('');
+            expect(deleteButton.props().to).toEqual('delete');
 
-            TestUtils.Simulate.click(deleteButtonNode);
+            wrapper.simulate('click');
 
-            expect(deleteButtonNode.attributes['data-click-to'].value).toEqual('delete');
-
-            const params = JSON.parse(deleteButtonNode.attributes['data-params'].value);
-            expect(params.entity).toEqual('MyEntity');
-            expect(params.id).toEqual(23);
+            expect(deleteButton.props().params.entity).toEqual('MyEntity');
+            expect(deleteButton.props().params.id).toEqual(23);
         });
     });
 });

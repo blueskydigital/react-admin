@@ -1,16 +1,19 @@
-jest.autoMockOff();
+jest.disableAutomock();
+import React from 'react';
+import { Link } from 'react-router';
+import { shallow, mount, render } from 'enzyme';
+
+import BooleanColumn from '../BooleanColumn';
 
 describe('BooleanColumn', () => {
-    const React = require('react/addons');
-    const TestUtils = React.addons.TestUtils;
-    const BooleanColumn = require('../BooleanColumn');
 
     it('should get a span with correct class depending of Column value', () => {
         [true, false].forEach((booleanValue) => {
-            let boolean = TestUtils.renderIntoDocument(<BooleanColumn value={booleanValue}/>);
-            boolean = React.findDOMNode(boolean);
+            const wrapper = shallow(
+              <BooleanColumn value={booleanValue}/>
+            );
 
-            expect(boolean.getAttribute('class')).toBe(`boolean-${booleanValue}`);
+            expect(wrapper.props().className).toBe(`boolean-${booleanValue}`);
         });
     });
 });

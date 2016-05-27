@@ -1,12 +1,31 @@
-jest.autoMockOff();
-jest.setMock('react-router', { Link: require('../Button/__mocks__/Link') });
+jest.disableAutomock();
+jest.mock('react-router');
+
+import React from 'react';
+import { Link } from 'react-router';
+import { shallow, mount, render } from 'enzyme';
+
+import Entity from 'admin-config/lib/Entity/Entity';
+import Entry from 'admin-config/lib/Entry';
+import NumberField from 'admin-config/lib/Field/NumberField';
+import Field from 'admin-config/lib/Field/Field';
+import DateField from 'admin-config/lib/Field/DateField';
+
+import FieldViewConfiguration from '../../Field/FieldViewConfiguration';
+import StringFieldView from '../../Field/StringFieldView';
+import NumberFieldView from '../../Field/NumberFieldView';
+import DateFieldView from '../../Field/DateFieldView';
+
+import RouterStub from '../../Test/RouterStub';
+import ComponentWrapper from '../../Test/ComponentWrapper';
+
+import DashboardPanel from '../DashboardPanel';
 
 describe('DashboardPanel', () => {
-    const React = require('react/addons');
-    const TestUtils = React.addons.TestUtils;
-    const DashboardPanel = require('../DashboardPanel');
-    const RouterStub = require('../../Test/RouterStub');
-    const ComponentWrapper = require('../../Test/ComponentWrapper');
+
+    FieldViewConfiguration.registerFieldView('string', StringFieldView);
+    FieldViewConfiguration.registerFieldView('number', NumberFieldView);
+    FieldViewConfiguration.registerFieldView('date', DateFieldView);
 
     function wrapComponent(configuration, cb) {
         const childContextTypes = {
@@ -20,21 +39,6 @@ describe('DashboardPanel', () => {
 
         return ComponentWrapper(childContextTypes, childContext, cb);
     }
-
-    const Entity = require('admin-config/lib/Entity/Entity');
-    const Entry = require('admin-config/lib/Entry');
-    const NumberField = require('admin-config/lib/Field/NumberField');
-    const Field = require('admin-config/lib/Field/Field');
-    const DateField = require('admin-config/lib/Field/DateField');
-
-    const FieldViewConfiguration = require('../../Field/FieldViewConfiguration');
-    const StringFieldView = require('../../Field/StringFieldView');
-    const NumberFieldView = require('../../Field/NumberFieldView');
-    const DateFieldView = require('../../Field/DateFieldView');
-
-    FieldViewConfiguration.registerFieldView('string', StringFieldView);
-    FieldViewConfiguration.registerFieldView('number', NumberFieldView);
-    FieldViewConfiguration.registerFieldView('date', DateFieldView);
 
     function getPanel(view, label, dataStore, sortDir, sortField, configuration) {
         if (!configuration) {
@@ -78,35 +82,30 @@ describe('DashboardPanel', () => {
 
     describe('Panel header', () => {
         it('should set header with label', () => {
-            let panel = getPanel(view, entity.label(), dataStore, null, null);
-            panel = React.findDOMNode(panel);
+            let panel = getPanel(view, entity.label(), dataStore, null, null, null);
 
-            const headers = [].slice.call(panel.getElementsByClassName('panel-heading')).map(h => h.textContent);
-            expect(headers).toEqual(['Posts']);
+            expect(panel.find('.panel-heading').first().text()).toEqual('Posts');
         });
 
         it('should set header with clickable label', () => {
             let panel = getPanel(view, entity.label(), dataStore, null, null);
-            panel = React.findDOMNode(panel);
+            const link = panel.find('.panel-heading Link');
 
-            const list = panel.getElementsByClassName('panel-heading')[0].querySelector('a');
-            TestUtils.Simulate.click(list);
+            link.simulate('click');
 
-            expect(list.attributes['data-click-to'].value).toEqual('list');
-            expect(list.attributes['data-params'].value).toEqual('{"entity":"posts"}');
+            expect(link.node.state.clickedTo).toEqual('list');
+            expect(link.node.state.params).toEqual('{"entity":"posts"}');
         });
     });
 
     describe('Panel entries', () => {
         it('should set rows with correct values for each field', () => {
             let panel = getPanel(view, entity.label(), dataStore, null, null);
-            panel = React.findDOMNode(panel);
-
-            const rows = panel.querySelectorAll('table tbody tr');
+            const rows = panel.find('table tbody tr');
 
             expect(rows.length).toEqual(1);
-            expect(rows[0].childNodes.length).toEqual(3);
-            expect(rows[0].childNodes[1].textContent).toEqual('First Post');
+            expect(rows.at(0).children().length).toEqual(3);
+            expect(rows.at(0).children().at(1).text()).toEqual('First Post');
         });
     });
 });

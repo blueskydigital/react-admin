@@ -34,6 +34,4 @@ TextField.propTypes = {
     updateField: React.PropTypes.func
 };
 
-require('../../autoloader')('TextField', TextField);
-
 export default TextField;

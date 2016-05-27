@@ -1,12 +1,16 @@
-jest.autoMockOff();
-jest.mock('../SelectField', jest.genMockFromModule('../SelectField'));
+jest.disableAutomock();
+jest.mock('../SelectField');
+
+import React from 'react';
+import TestUtils from 'react-addons-test-utils';
+// import sd from 'skin-deep';
+import SelectField from '../SelectField';
+import AdminChoiceField from 'admin-config/lib/Field/ChoiceField';
+import Immutable from 'immutable';
+
+import ChoiceField from '../ChoiceField';
 
 describe('ChoiceField', () => {
-    const React = require('react/addons');
-    const TestUtils = React.addons.TestUtils;
-    const ChoiceField = require('../ChoiceField');
-    const SelectField = require('../SelectField');
-    const Immutable = require('immutable');
 
     let values;
 
@@ -16,14 +20,15 @@ describe('ChoiceField', () => {
     });
 
     it('should get a choice with correct props', () => {
-        const AdminChoiceField = require('admin-config/lib/Field/ChoiceField');
         const myChoiceField = new AdminChoiceField('my_field');
         myChoiceField.choices([
             { value: 1, label: 'First choice' },
             { value: 2, label: 'Second choice' },
             { value: 3, label: 'Third choice' }
         ]);
-        const instance = TestUtils.renderIntoDocument(<ChoiceField fieldName="my_field" field={myChoiceField} values={values}/>);
+        const instance = TestUtils.renderIntoDocument(
+          <ChoiceField fieldName="my_field" field={myChoiceField} values={values}/>
+        );
         const select = TestUtils.findRenderedComponentWithType(instance, SelectField);
 
         expect(select.props.choices).toEqual([
@@ -34,7 +39,6 @@ describe('ChoiceField', () => {
     });
 
     it('should get a filtered choice with correct props', () => {
-        const AdminChoiceField = require('admin-config/lib/Field/ChoiceField');
         const myChoiceField = new AdminChoiceField('my_field');
         myChoiceField.choices(function (entry) {
             const choices = {
@@ -48,7 +52,9 @@ describe('ChoiceField', () => {
             return choices[entry.values.otherFieldVal];
         });
         values = values.set('otherFieldVal', 'something');
-        const instance = TestUtils.renderIntoDocument(<ChoiceField fieldName="my_field" field={myChoiceField} values={values}/>);
+        const instance = TestUtils.renderIntoDocument(
+          <ChoiceField fieldName="my_field" field={myChoiceField} values={values}/>
+        );
         const select = TestUtils.findRenderedComponentWithType(instance, SelectField);
 
         expect(select.props.choices).toEqual([

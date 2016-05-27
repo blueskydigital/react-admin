@@ -22,6 +22,4 @@ DateColumn.propTypes = {
     field: React.PropTypes.object
 };
 
-require('../../autoloader')('DateColumn', DateColumn);
-
 export default DateColumn;

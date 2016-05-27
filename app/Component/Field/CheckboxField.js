@@ -36,6 +36,4 @@ CheckboxField.propTypes = {
     updateField: React.PropTypes.func
 };
 
-require('../../autoloader')('CheckboxField', CheckboxField);
-
 export default CheckboxField;

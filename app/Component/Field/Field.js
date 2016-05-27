@@ -48,6 +48,4 @@ Field.contextTypes = {
     configuration: React.PropTypes.object
 };
 
-require('../../autoloader')('Field', Field);
-
 export default Field;

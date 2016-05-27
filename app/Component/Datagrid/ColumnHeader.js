@@ -43,6 +43,4 @@ ColumnHeader.contextTypes = {
     router: React.PropTypes.func.isRequired
 };
 
-require('../../autoloader')('ColumnHeader', ColumnHeader);
-
 export default ColumnHeader;

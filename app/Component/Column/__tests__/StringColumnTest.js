@@ -1,15 +1,15 @@
-jest.autoMockOff();
+jest.disableAutomock();
+import React from 'react';
+import { Link } from 'react-router';
+import { shallow, mount, render } from 'enzyme';
+
+import StringColumn from '../StringColumn';
 
 describe('StringColumn', () => {
-    const React = require('react/addons');
-    const TestUtils = React.addons.TestUtils;
-    const StringColumn = require('../StringColumn');
 
     it('should display given value', () => {
-        let field = TestUtils.renderIntoDocument(<StringColumn value={'Hello'} />);
-        field = React.findDOMNode(field);
+        const wrapper = shallow(<StringColumn value={'Hello'} />);
 
-        expect(field.innerHTML).toBe('Hello');
-        expect(field.tagName.toLowerCase()).toBe('span');
+        expect(wrapper.find('span').text()).toBe('Hello');
     });
 });

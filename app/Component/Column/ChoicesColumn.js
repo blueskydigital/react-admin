@@ -22,6 +22,4 @@ ChoicesColumn.propTypes = {
     values: React.PropTypes.array
 };
 
-require('../../autoloader')('ChoicesColumn', ChoicesColumn);
-
 export default ChoicesColumn;

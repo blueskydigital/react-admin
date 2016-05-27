@@ -35,6 +35,4 @@ InputField.propTypes = {
     autoFocus: React.PropTypes.bool
 };
 
-require('../../autoloader')('InputField', InputField);
-
 export default InputField;
