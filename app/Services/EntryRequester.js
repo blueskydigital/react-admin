@@ -59,8 +59,7 @@ class EntryRequester {
         let dataStore = new DataStore();
 
         let promise = new Promise((resolve) => {
-            // let entry = dataStore.createEntry(view.entity.name(), view.identifier(), view.getFields());
-            let entry = {};
+            let entry = new Entry(view.entity.name(), view.getFields(), view.identifier());
             resolve({
                 rawEntries: [],
                 entries: [entry]
