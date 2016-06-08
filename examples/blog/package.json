@@ -3,6 +3,7 @@
   "version": "0.0.2",
   "description": "React.js blog example",
   "dependencies": {
+    "moment": "^2.13.0",
     "react": "^0.14.8",
     "react-dom": "^15.1.0",
     "react-router": "^2.4.1"
