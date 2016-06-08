@@ -1,5 +1,6 @@
-var React = require('react');
+import React from 'react';
 import { truncate } from '../utils';
+import { Link } from 'react-router';
 
 export default function (nga, admin) {
 
@@ -18,7 +19,8 @@ export default function (nga, admin) {
           nga.field(null, 'template') // template fields don't need a name in dashboard view
                .label('Edition')
                .template(function() {
-                  return <Link to="edit" params={{entity: "comments", id: this.props.entry.identifierValue}}>Edit</Link>;
+                  const to = `/${this.props.entry.entityName}/edit/${this.props.entry.identifierValue}`;
+                  return <Link to={to}>Edit</Link>;
               }) // you can use custom directives, too
       ]);
 

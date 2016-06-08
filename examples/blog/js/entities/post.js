@@ -1,4 +1,4 @@
-var React = require('react');
+import React from 'react';
 import { truncate } from '../utils';
 
 export default function (nga, admin) {

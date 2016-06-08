@@ -1,10 +1,18 @@
-var React = require('react');
-var ReactRouter = require('react-router');
-var ReactAdmin = require('../build/react-admin-standalone.min');
+import React from 'react';
+import { render } from 'react-dom';
+import { Route } from 'react-router';
+// import ReactAdmin from '../build/react-admin-standalone.min.js';
+import ReactAdmin from '../../../app/ReactAdmin';
+
+import * as ApiFlavor from './api_flavor';
+import ETags from './entities/tag';
+import EComments from './entities/comment';
+import EPosts from './entities/post';
+import MyMenu from './menu';
 
 function configureApp(nga, fieldViewConfiguration, components, routes, restful, autoload) {
 
-    require('./api_flavor').init(restful);
+    ApiFlavor.init(restful);
 
     // Add custom component
     var SendEmail = React.createClass({
@@ -23,16 +31,15 @@ function configureApp(nga, fieldViewConfiguration, components, routes, restful, 
         .addEntity(nga.entity('comments'))
         .addEntity(nga.entity('posts'));
     // init them
-    var tag = require('./entities/tag')(nga, admin);
-    var comment = require('./entities/comment')(nga, admin);
-    var post = require('./entities/post')(nga, admin);
+    var tag = ETags(nga, admin);
+    var comment = EComments(nga, admin);
+    var post = EPosts(nga, admin);
 
     // customize menu
-    admin.menu(require('./menu')(nga, admin));
+    admin.menu(MyMenu(nga, admin));
 
     // Add custom route
     var ViewActions = components.ViewActions;
-    var Route = ReactRouter.Route;
     var Stats = React.createClass({
         render: function () {
             return <div>
@@ -43,12 +50,14 @@ function configureApp(nga, fieldViewConfiguration, components, routes, restful, 
         }
     });
 
-    routes.props.children.push(<Route name="stats" path="/stats" handler={Stats} />);
+    routes.props.children.push(
+      <Route name="stats" path="/stats" component={Stats} />
+    );
 
     return admin;
 }
 
-React.render(
+render(
   <ReactAdmin configureApp={configureApp} />,
   document.getElementById('my-app')
 );
