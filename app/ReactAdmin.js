@@ -1,39 +1,17 @@
-import autoload from './autoloader';
-
 import React from 'react';
-import Router from 'react-router';
+import { Router, Route, Link, IndexRoute, browserHistory } from 'react-router';
 import Restful from 'restful.js';
 
 import ConfigurationFactory from 'admin-config/lib/Factory';
 
-import AdminBootstrap from './AdminBootstrap';
-
-import DashboardView from './View/Dashboard';
-import ListView from './View/List';
-import ShowView from './View/Show';
-import CreateView from './View/Create';
-import EditView from './View/Edit';
-import DeleteView from './View/Delete';
-import NotFoundView from './View/NotFound';
-
 import ViewActions from './Component/ViewActions';
 import FieldViewConfiguration from './Field/FieldViewConfiguration';
 
+import autoload from './autoloader'
+import routes from './routes'
+import NotFoundView from './View/NotFound';
+
 import Pace from 'pace';
-
-let routes = (
-    <Router.Route name="react-admin" path="/" handler={AdminBootstrap}>
-        <Router.DefaultRoute name="dashboard" handler={DashboardView}/>
-
-        <Router.Route name="list" path="/:entity/list" handler={ListView}/>
-        <Router.Route name="create" path="/:entity/create" handler={CreateView}/>
-        <Router.Route name="edit" path="/:entity/edit/:id" handler={EditView}/>
-        <Router.Route name="delete" path="/:entity/delete/:id" handler={DeleteView}/>
-        <Router.Route name="show" path="/:entity/show/:id" handler={ShowView}/>
-
-        <Router.NotFoundRoute handler={NotFoundView}/>
-    </Router.Route>
-);
 
 class ReactAdmin extends React.Component {
     constructor(props, context) {
@@ -52,28 +30,14 @@ class ReactAdmin extends React.Component {
             autoload
         );
 
-        this.loaded = false;
+        // add default route
+        routes.props.children.push(<Route path="*" component={NotFoundView} />);
 
-        Router.run(routes, (Handler) => {
-            if (this.loaded) {
-                this.setState({
-                    handler: Handler
-                });
-            }
-
-            this.state = {
-                handler: Handler,
-                configuration: configuration,
-                restful: restful
-            };
-            this.loaded = true;
-        });
-    }
-
-    getChildContext() {
-        return {
-            restful: this.state.restful
+        this.state = {
+            configuration: configuration,
+            restful: restful
         };
+        this.loaded = true;
     }
 
     componentDidUpdate() {
@@ -85,15 +49,25 @@ class ReactAdmin extends React.Component {
         // start progress bar
         Pace.start();
 
-        const Handler = this.state.handler;
+        // custom creation fn to pass down config to every component
+        // Component wrapper:
+        // http://stackoverflow.com/questions/27864720/react-router-pass-props-to-handler-component/27868548#27868548
+        //
+        // Custom createElement:
+        // https://github.com/reactjs/react-router/issues/1857
+        let state = this.state;
+        var createElement = function (Component, props) {
+          return <Component {...props}
+            configuration={state.configuration} restful={state.restful} />
+        };
 
-        return <Handler configuration={this.state.configuration}/>;
+        return (
+          <Router history={browserHistory} createElement={createElement}>
+            {routes}
+          </Router>
+        );
     }
 }
-
-ReactAdmin.childContextTypes = {
-    restful: React.PropTypes.func.isRequired
-};
 
 ReactAdmin.propTypes = {
     configureApp: React.PropTypes.func.isRequired

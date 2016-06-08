@@ -25,7 +25,7 @@ class ShowView extends React.Component {
         this.onLoadFailure = onLoadFailure.bind(this);
 
         this.viewName = 'ShowView';
-        this.isValidEntityAndView = this.hasEntityAndView(context.router.getCurrentParams().entity);
+        this.isValidEntityAndView = this.hasEntityAndView(this.props.routeParams.entity);
     }
 
     componentDidMount() {
@@ -61,8 +61,8 @@ class ShowView extends React.Component {
     }
 
     refreshData() {
-        const {id} = this.context.router.getCurrentParams();
-        const {sortField, sortDir} = this.context.router.getCurrentQuery() || {};
+        const {id} = this.props.routeParams;
+        const {sortField, sortDir} = this.props.location.query || {};
 
         EntityActions.loadShowData(this.context.restful, this.context.configuration, this.getView(), id, sortField, sortDir);
     }
@@ -80,7 +80,7 @@ class ShowView extends React.Component {
             return <NotFoundView/>;
         }
 
-        const entityName = this.context.router.getCurrentParams().entity;
+        const entityName = this.props.routeParams.entity;
         const view = this.getView(entityName);
         const dataStore = this.state.data.getIn(['dataStore', 'object']);
         const entry = dataStore.getFirstEntry(view.getEntity().uniqueId);
@@ -116,7 +116,6 @@ class ShowView extends React.Component {
 }
 
 ShowView.contextTypes = {
-    router: React.PropTypes.func.isRequired,
     restful: React.PropTypes.func.isRequired,
     configuration: React.PropTypes.object.isRequired
 };

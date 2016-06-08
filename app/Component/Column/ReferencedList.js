@@ -4,7 +4,7 @@ import Datagrid from '../Datagrid/Datagrid';
 class ReferencedList extends React.Component {
     render() {
         const {entries, field, entityName} = this.props;
-        const {sortField, sortDir} = this.context.router.getCurrentQuery() || {};
+        const {sortField, sortDir} = this.props.location.query || {};
 
         return (
             <Datagrid
@@ -29,7 +29,6 @@ ReferencedList.propTypes = {
 };
 
 ReferencedList.contextTypes = {
-    router: React.PropTypes.func.isRequired,
     configuration: React.PropTypes.object.isRequired
 };
 

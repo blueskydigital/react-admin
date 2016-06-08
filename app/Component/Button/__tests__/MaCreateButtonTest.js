@@ -23,11 +23,7 @@ describe('MaCreateButton', () => {
             );
             const createButton = wrapper.find('.btn');
 
-            expect(createButton.props().to).toEqual('create');
-
-            wrapper.simulate('click');
-
-            expect(createButton.props().params.entity).toEqual('MyEntity');
+            expect(createButton.props().to).toEqual('/MyEntity/create');
         });
     });
 });

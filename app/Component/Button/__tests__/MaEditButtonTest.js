@@ -29,12 +29,12 @@ describe('MaEditButton', () => {
             );
             const editButton = wrapper.find('.btn');
 
-            expect(editButton.props().to).toEqual('edit');
+            expect(editButton.props().to).toEqual('/MyEntity/edit/24');
 
-            wrapper.simulate('click');
-
-            expect(editButton.props().params.entity).toEqual('MyEntity');
-            expect(editButton.props().params.id).toEqual(24);
+            // wrapper.simulate('click');
+            //
+            // expect(editButton.props().params.entity).toEqual('MyEntity');
+            // expect(editButton.props().params.id).toEqual(24);
         });
     });
 });

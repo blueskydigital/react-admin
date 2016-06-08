@@ -24,7 +24,7 @@ export function hasEntityAndView(entityName) {
 }
 
 export function getView(entityName=null) {
-    entityName = entityName || this.context.router.getCurrentParams().entity;
+    entityName = entityName || this.props.routeParams.entity;
     const entity = this.props.configuration.getEntity(entityName);
 
     if (!entity.views.hasOwnProperty(this.viewName)) {

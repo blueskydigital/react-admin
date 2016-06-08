@@ -29,12 +29,7 @@ describe('MaShowButton', () => {
             );
             const button = wrapper.find('.btn');
 
-            expect(button.props().to).toEqual('show');
-
-            wrapper.simulate('click');
-
-            expect(button.props().params.entity).toEqual('MyEntity');
-            expect(button.props().params.id).toEqual(23);
+            expect(button.props().to).toEqual('/MyEntity/show/23');
         });
     });
 });

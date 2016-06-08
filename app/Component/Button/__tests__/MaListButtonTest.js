@@ -31,11 +31,7 @@ describe('MaListButton', () => {
             );
             const button = wrapper.find('.btn');
 
-            expect(button.props().to).toEqual('list');
-
-            wrapper.simulate('click');
-
-            expect(button.props().params.entity).toEqual('Gandalf');
+            expect(button.props().to).toEqual('/Gandalf/list');
         });
     });
 });

@@ -18,8 +18,8 @@ class Datagrid extends React.Component {
             const entityName = this.props.entityName;
             const entity = this.context.configuration.getEntity(entityName);
             const route = entity.editionView().enabled ? 'edit' : 'show';
-
-            this.context.router.transitionTo(route, {entity: entityName, id: entry.identifierValue});
+            const to = `/${entityName}/${route}/${entry.identifierValue}`;
+            this.props.history.push(to);
         };
     }
 
@@ -128,7 +128,6 @@ Datagrid.propTypes = {
 };
 
 Datagrid.contextTypes = {
-    router: React.PropTypes.func.isRequired,
     configuration: React.PropTypes.object
 };
 

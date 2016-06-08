@@ -53,8 +53,7 @@ describe('DatagridActions', () => {
             let edit = actions.find('Link');
 
             edit.simulate('click');
-            expect(edit.node.state.clickedTo).toEqual('edit');
-            expect(edit.node.state.params).toEqual('{"entity":"MyEntity","id":1}');
+            expect(edit.props().to).toEqual('/MyEntity/edit/1');
         });
     });
 });

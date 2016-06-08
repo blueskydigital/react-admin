@@ -11,8 +11,8 @@ describe('Compile', () => {
         return mount(<Compile>{strElement}</Compile>);
     }
 
-    function getCompiledLink(to, params) {
-        return mount(<Compile><Link to={to} params={params}></Link></Compile>);
+    function getCompiledLink(to) {
+        return mount(<Compile><Link to={to}></Link></Compile>);
     }
 
     describe('With simple string', () => {
@@ -67,14 +67,12 @@ describe('Compile', () => {
             let compiled = getCompiledLinkFromString(
               '<MaCreateButton entityName={"tags"} />'
             );
-            expect(compiled.find('Link').props().to).toEqual('create');
-            expect(compiled.find('Link').props().params.entity).toEqual('tags');
+            expect(compiled.find('Link').props().to).toEqual('/tags/create');
         });
 
         it('Should be able to use another component from jsx', () => {
-            let compiled = getCompiledLink('create', {entity: 'posts'});
-            expect(compiled.find('Link').props().to).toEqual('create');
-            expect(compiled.find('Link').props().params.entity).toEqual('posts');
+            let compiled = getCompiledLink('create');
+            expect(compiled.find('Link').props().to).toEqual('/posts/create');
         });
     });
 

@@ -31,10 +31,14 @@ describe('Filters', () => {
     const updateField = (name, value) => {
         updated[name] = value;
     };
+    const loc = {
+
+    };
 
     function getFilters(filters) {
         return routerWrapper(() =>
-          <Filters filters={filters} hideFilter={hideFilter} updateField={updateField} />
+          <Filters filters={filters} hideFilter={hideFilter} updateField={updateField}
+            location={loc} />
         );
     }
 

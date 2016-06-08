@@ -30,12 +30,12 @@ describe('MaDeleteButton', () => {
             );
             const deleteButton = wrapper.find('.btn');
 
-            expect(deleteButton.props().to).toEqual('delete');
+            expect(deleteButton.props().to).toEqual('/MyEntity/delete/23');
 
-            wrapper.simulate('click');
-
-            expect(deleteButton.props().params.entity).toEqual('MyEntity');
-            expect(deleteButton.props().params.id).toEqual(23);
+            // wrapper.simulate('click');
+            //
+            // expect(deleteButton.props().params.entity).toEqual('MyEntity');
+            // expect(deleteButton.props().params.id).toEqual(23);
         });
     });
 });

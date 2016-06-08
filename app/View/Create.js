@@ -29,7 +29,7 @@ class CreateView extends React.Component {
         this.updateField = debounce(this.updateField.bind(this), 300);
 
         this.viewName = 'CreateView';
-        this.isValidEntityAndView = this.hasEntityAndView(context.router.getCurrentParams().entity);
+        this.isValidEntityAndView = this.hasEntityAndView(this.props.routeParams.entity);
     }
 
     componentDidMount() {
@@ -87,13 +87,14 @@ class CreateView extends React.Component {
     }
 
     onCreate() {
-        const entityName = this.context.router.getCurrentParams().entity;
+        const entityName = this.props.routeParams.entity;
         const dataStore = this.state.data.get('dataStore').first();
         const entry = dataStore.getFirstEntry(this.getView(entityName).entity.uniqueId);
 
         Notification.log('Element successfully created.', {addnCls: 'humane-flatty-success'});
 
-        this.context.router.transitionTo('edit', { entity: entityName, id: entry.identifierValue });
+        const to = `/${entityName}/edit/${entry.identifierValue}`;
+        this.props.history.push(to);
     }
 
     buildFields(view, entry, dataStore) {
@@ -128,7 +129,7 @@ class CreateView extends React.Component {
             return <NotFoundView/>;
         }
 
-        const entityName = this.context.router.getCurrentParams().entity;
+        const entityName = this.props.routeParams.entity;
         const view = this.getView(entityName);
         const dataStore = this.state.data.get('dataStore').first();
         const entry = dataStore.getFirstEntry(view.entity.uniqueId);
@@ -164,7 +165,6 @@ class CreateView extends React.Component {
 }
 
 CreateView.contextTypes = {
-    router: React.PropTypes.func.isRequired,
     restful: React.PropTypes.func.isRequired,
     configuration: React.PropTypes.object.isRequired
 };

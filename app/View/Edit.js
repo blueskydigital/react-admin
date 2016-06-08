@@ -29,7 +29,7 @@ class EditView extends React.Component {
         this.updateField = debounce(this.updateField.bind(this), 300);
 
         this.viewName = 'EditView';
-        this.isValidEntityAndView = this.hasEntityAndView(context.router.getCurrentParams().entity);
+        this.isValidEntityAndView = this.hasEntityAndView(this.props.routeParams.entity);
     }
 
     componentDidMount() {
@@ -81,8 +81,8 @@ class EditView extends React.Component {
     }
 
     refreshData() {
-        const {id} = this.context.router.getCurrentParams();
-        const {sortField, sortDir} = this.context.router.getCurrentQuery() || {};
+        const {id} = this.props.routeParams;
+        const {sortField, sortDir} = this.props.routeParams || {};
 
         EntityActions.loadEditData(this.context.restful, this.context.configuration, this.getView(), id, sortField, sortDir);
     }
@@ -131,7 +131,7 @@ class EditView extends React.Component {
             return <NotFoundView/>;
         }
 
-        const entityName = this.context.router.getCurrentParams().entity;
+        const entityName = this.props.routeParams.entity;
         const view = this.getView(entityName);
         const dataStore = this.state.data.get('dataStore').first();
         const entry = dataStore.getFirstEntry(view.entity.uniqueId);
@@ -167,7 +167,6 @@ class EditView extends React.Component {
 }
 
 EditView.contextTypes = {
-    router: React.PropTypes.func.isRequired,
     restful: React.PropTypes.func.isRequired,
     configuration: React.PropTypes.object.isRequired
 };

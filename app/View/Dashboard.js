@@ -39,9 +39,9 @@ class DashboardView extends React.Component {
     }
 
     refreshData() {
-        const {sortField, sortDir} = this.context.router.getCurrentQuery() || {};
+        const {sortField, sortDir} = this.props.location.query || {};
 
-        EntityActions.loadDashboardPanels(this.context.restful, this.context.configuration, sortField, sortDir);
+        EntityActions.loadDashboardPanels(this.props.restful, this.props.configuration, sortField, sortDir);
     }
 
     buildPanels(panels, odd=true) {
@@ -107,7 +107,6 @@ class DashboardView extends React.Component {
 }
 
 DashboardView.contextTypes = {
-    router: React.PropTypes.func.isRequired,
     restful: React.PropTypes.func.isRequired,
     configuration: React.PropTypes.object.isRequired
 };

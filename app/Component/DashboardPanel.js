@@ -8,14 +8,12 @@ class DashboardPanel extends React.Component {
         const view = this.props.view;
         const entity = view.entity;
         const entries = this.props.dataStore.getEntries(entity.uniqueId);
-        const params = {
-            entity: entity.name()
-        };
+        const to = `/${entity.name()}/list`;
 
         return (
             <div>
                 <div className="panel-heading">
-                    <Link to="list" params={params}>{this.props.label}</Link>
+                    <Link to={to}>{this.props.label}</Link>
                 </div>
 
                 <Datagrid

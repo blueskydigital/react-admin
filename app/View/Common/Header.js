@@ -7,7 +7,7 @@ class Header extends React.Component {
         return (
             <header className="header">
                 <h1>
-                    <Link to="dashboard">
+                    <Link to="/">
                         <Compile>{this.props.title}</Compile>
                     </Link>
                 </h1>

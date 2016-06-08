@@ -28,7 +28,7 @@ class DeleteView extends React.Component {
         this.onSendFailure = onSendFailure.bind(this);
 
         this.viewName = 'DeleteView';
-        this.isValidEntityAndView = this.hasEntityAndView(context.router.getCurrentParams().entity);
+        this.isValidEntityAndView = this.hasEntityAndView(this.props.routeParams.entity);
     }
 
     componentDidMount() {
@@ -67,24 +67,24 @@ class DeleteView extends React.Component {
     }
 
     refreshData() {
-        const { id } = this.context.router.getCurrentParams();
+        const { id } = this.props.routeParams;
 
         EntityActions.loadDeleteData(this.context.restful, this.context.configuration, this.getView(), id);
     }
 
     deleteEntry() {
-        const { id } = this.context.router.getCurrentParams();
+        const { id } = this.props.routeParams;
 
         EntityActions.deleteData(this.context.restful, this.context.configuration, id, this.getView());
     }
 
     onDelete() {
-        const params = this.context.router.getCurrentParams();
+        const params = this.props.routeParams;
         const entityName = params.entity;
 
         Notification.log('Element successfully deleted.', { addnCls: 'humane-flatty-success' });
 
-        this.context.router.transitionTo('list', {entity: entityName});
+        this.props.history.push(`/${entityName}/list`);
     }
 
     render() {
@@ -100,13 +100,13 @@ class DeleteView extends React.Component {
             return <NotFoundView/>;
         }
 
-        const entityName = this.context.router.getCurrentParams().entity;
+        const entityName = this.props.routeParams.entity;
         const view = this.getView(entityName);
         const dataStore = this.state.data.get('dataStore').first();
         const entry = dataStore.getFirstEntry(view.entity.uniqueId);
         const backParams = {
             entity: entityName,
-            id: this.context.router.getCurrentParams().id
+            id: this.props.routeParams.id
         };
 
         if (!entry) {
@@ -139,7 +139,6 @@ class DeleteView extends React.Component {
 }
 
 DeleteView.contextTypes = {
-    router: React.PropTypes.func.isRequired,
     restful: React.PropTypes.func.isRequired,
     configuration: React.PropTypes.object.isRequired
 };

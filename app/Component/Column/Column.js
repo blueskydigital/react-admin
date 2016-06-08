@@ -10,7 +10,8 @@ class Column extends React.Component {
             const entity = this.context.configuration.getEntity(entityName);
             const route = entity.editionView().enabled ? 'edit' : 'show';
 
-            this.context.router.transitionTo(route, {entity: entityName, id: entry.identifierValue});
+            const to = `/${entityName}/${route}/${entry.identifierValue}`;
+            this.props.history.push(to);
         }.bind(this);
     }
 
@@ -62,7 +63,7 @@ Column.propTypes = {
 };
 
 Column.contextTypes = {
-    router: React.PropTypes.func.isRequired,
+    router: React.PropTypes.object.isRequired,
     configuration: React.PropTypes.object.isRequired
 };
 

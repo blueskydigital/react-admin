@@ -39,7 +39,7 @@ class ListView extends React.Component {
         this.refreshList = debounce(this.refreshList.bind(this), 300);
 
         this.viewName = 'ListView';
-        this.isValidEntityAndView = this.hasEntityAndView(context.router.getCurrentParams().entity);
+        this.isValidEntityAndView = this.hasEntityAndView(this.props.routeParams.entity);
     }
 
     componentDidMount() {
@@ -95,7 +95,7 @@ class ListView extends React.Component {
         let selected = viewFilters.filter(filter => filter.pinned());
         let unselected = [];
 
-        const { search } = this.context.router.getCurrentQuery() || {};
+        const { search } = this.props.location.query || {};
         for (let filter of viewFilters) {
             if (filter.pinned()) {
                 continue;
@@ -123,7 +123,7 @@ class ListView extends React.Component {
     }
 
     updateFilterField(name, value) {
-        let query = this.context.router.getCurrentQuery() || {};
+        let query = this.props.location.query || {};
 
         if (!query.search) {
             query.search = {};
@@ -156,7 +156,7 @@ class ListView extends React.Component {
     }
 
     onListSort(field, dir) {
-        let query = this.context.router.getCurrentQuery() || {};
+        let query = this.props.location.query || {};
         query.sortField = field;
         query.sortDir = dir;
 
@@ -164,7 +164,7 @@ class ListView extends React.Component {
     }
 
     onPageChange(page) {
-        let query = this.context.router.getCurrentQuery() || {};
+        let query = this.props.location.query || {};
         query.page = page;
 
         this.refreshList(query);
@@ -173,12 +173,12 @@ class ListView extends React.Component {
     refreshList(query) {
         const entityName = this.getView().entity.name();
 
-        this.context.router.transitionTo('list', { entity: entityName }, query);
+        this.props.history.push(`/${entityName}/list?${query}`);
         this.refreshData();
     }
 
     refreshData() {
-        const { page, sortField, sortDir, search } = this.context.router.getCurrentQuery() || {};
+        const { page, sortField, sortDir, search } = this.props.location.query || {};
 
         EntityActions.loadListData(this.context.restful, this.context.configuration, this.getView(), page, sortField, sortDir, search);
     }
@@ -203,7 +203,7 @@ class ListView extends React.Component {
             return <NotFoundView/>;
         }
 
-        const entityName = this.context.router.getCurrentParams().entity;
+        const entityName = this.props.routeParams.entity;
         const view = this.getView(entityName);
         const filters = this.state.application.get('filters');
         const sortDir = this.state.entity.get('sortDir');
@@ -263,7 +263,6 @@ class ListView extends React.Component {
 }
 
 ListView.contextTypes = {
-    router: React.PropTypes.func.isRequired,
     restful: React.PropTypes.func.isRequired,
     configuration: React.PropTypes.object.isRequired
 };

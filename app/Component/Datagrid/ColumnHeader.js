@@ -39,8 +39,4 @@ ColumnHeader.propTypes = {
     onSort: React.PropTypes.func
 };
 
-ColumnHeader.contextTypes = {
-    router: React.PropTypes.func.isRequired
-};
-
 export default ColumnHeader;

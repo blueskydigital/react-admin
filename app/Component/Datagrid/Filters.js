@@ -14,7 +14,7 @@ class Filters extends React.Component {
     buildRows(filters) {
         const { entity, dataStore, updateField, hideFilter } = this.props;
         const configuration = this.context.configuration;
-        const { search } = this.context.router.getCurrentQuery() || {};
+        const { search } = this.props.location.query || {};
 
         return filters.map((filter, i) => {
             const filterName = filter.name();
@@ -75,7 +75,6 @@ Filters.propTypes = {
 };
 
 Filters.contextTypes = {
-    router: React.PropTypes.func.isRequired,
     restful: React.PropTypes.func.isRequired,
     configuration: React.PropTypes.object.isRequired
 };

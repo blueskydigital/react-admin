@@ -5,12 +5,10 @@ class MaListButton extends React.Component {
     render() {
         const size = this.props.size ? ` btn-${this.props.size}` : '';
         const className = `btn btn-list btn-default${size}`;
-        const params = {
-                entity: this.props.entityName
-            };
+        const to = `/${this.props.entityName}/list`;
 
         return (
-            <Link className={className} to="list" params={params}>
+            <Link className={className} to={to}>
                 <span className="glyphicon glyphicon-list" aria-hidden="true"></span>&nbsp;{this.props.label || 'List'}
             </Link>
         );

@@ -42,7 +42,8 @@ FieldViewConfiguration.registerFieldView('wysiwyg', WysiwygFieldView);
 class AdminBootstrap extends React.Component {
     getChildContext() {
         return {
-            configuration: this.props.configuration
+            configuration: this.props.configuration,
+            restful: this.props.restful
         };
     }
 
@@ -52,7 +53,7 @@ class AdminBootstrap extends React.Component {
                 <Header title={this.props.configuration.title()}/>
                 <Sidebar menuViews={this.props.configuration.menu()}/>
                 <div className="view-wrapper">
-                    <RouteHandler configuration={this.props.configuration}/>
+                    {this.props.children}
                 </div>
             </div>
         );
@@ -60,14 +61,12 @@ class AdminBootstrap extends React.Component {
 }
 
 AdminBootstrap.childContextTypes = {
-    configuration: React.PropTypes.object.isRequired
+    configuration: React.PropTypes.object.isRequired,
+    restful: React.PropTypes.func.isRequired
 };
 
 AdminBootstrap.propTypes = {
     configuration: React.PropTypes.object.isRequired
 };
-
-require('./autoloader')('AdminBootstrap', AdminBootstrap);
-require('./autoloader')('Link', Link);
 
 export default AdminBootstrap;
