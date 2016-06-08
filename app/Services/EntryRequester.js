@@ -3,6 +3,7 @@ import PromisesResolver from 'admin-config/lib/Utils/PromisesResolver';
 import ReadQueries from 'admin-config/lib/Queries/ReadQueries';
 import WriteQueries from 'admin-config/lib/Queries/WriteQueries';
 import DataStore from 'admin-config/lib/DataStore/DataStore';
+import Entry from 'admin-config/lib/Entry';
 
 class EntryRequester {
     constructor(configuration, restWrapper) {
@@ -26,7 +27,10 @@ class EntryRequester {
             .getAll(view, page, options.filters, options.sortField, options.sortDir)
             .then((response) => {
                 rawEntries = response.data;
-                entries = dataStore.mapEntries(view.entity.name(), view.identifier(), view.getFields(), rawEntries);
+                entries = Entry.createArrayFromRest(
+                  rawEntries, view.getFields(), view.entity.name(),
+                  view.identifier().name()
+                );
                 totalItems = +response.totalItems;
 
                 return { rawEntries, entries };
@@ -55,8 +59,8 @@ class EntryRequester {
         let dataStore = new DataStore();
 
         let promise = new Promise((resolve) => {
-            let entry = dataStore.createEntry(view.entity.name(), view.identifier(), view.getFields());
-
+            // let entry = dataStore.createEntry(view.entity.name(), view.identifier(), view.getFields());
+            let entry = {};
             resolve({
                 rawEntries: [],
                 entries: [entry]
@@ -91,11 +95,11 @@ class EntryRequester {
                     rawEntries: [data]
                 };
 
-                response.entries = [dataStore.mapEntry(
-                    view.entity.name(),
-                    view.identifier(),
+                response.entries = [Entry.createFromRest(
+                    response.rawEntries[0],
                     view.getFields(),
-                    response.rawEntries[0]
+                    view.entity.name(),
+                    view.identifier().name()
                 )];
 
                 return response;
@@ -134,11 +138,11 @@ class EntryRequester {
         }
 
         return query.then((data) => {
-            let entry = dataStore.mapEntry(
-                view.entity.name(),
-                view.identifier(),
+            let entry = Entry.createFromRest(
+                data,
                 view.getFields(),
-                data
+                view.entity.name(),
+                view.identifier().name()
             );
 
             dataStore.fillReferencesValuesFromEntry(entry, view.getReferences(), true);
@@ -175,11 +179,11 @@ class EntryRequester {
                 referencedEntries;
 
             for (let name in referencedData) {
-                referencedEntries = dataStore.mapEntries(
-                    references[name].targetEntity().name(),
-                    references[name].targetEntity().identifier(),
-                    [references[name].targetField()],
-                    referencedData[name]
+                referencedEntries = Entry.createArrayFromRest(
+                  referencedData[name],
+                  [references[name].targetField()],
+                  references[name].targetEntity().name(),
+                  references[name].targetEntity().identifier().name()
                 );
 
                 dataStore.setEntries(
@@ -213,11 +217,10 @@ class EntryRequester {
                 referencedList = referencedLists[i];
                 referencedListEntries = referencedListData[i];
 
-                referencedListEntries = dataStore.mapEntries(
-                    referencedList.targetEntity().name(),
-                    referencedList.targetEntity().identifier(),
-                    referencedList.targetFields(),
-                    referencedListEntries
+                referencedListEntries = Entry.createArrayFromRest(
+                  referencedListEntries, referencedList.targetFields(),
+                  referencedList.targetEntity().name(),
+                  referencedList.targetEntity().identifier().name()
                 );
 
                 dataStore.setEntries(
@@ -244,11 +247,11 @@ class EntryRequester {
             let choiceEntries;
 
             for (let name in choicesData) {
-                choiceEntries = dataStore.mapEntries(
-                    choices[name].targetEntity().name(),
-                    choices[name].targetEntity().identifier(),
-                    [choices[name].targetField()],
-                    choicesData[name]
+                choiceEntries = Entry.createArrayFromRest(
+                  choicesData[name],
+                  [choices[name].targetField()],
+                  choices[name].targetEntity().name(),
+                  choices[name].targetEntity().identifier().name()
                 );
 
                 dataStore.setEntries(
