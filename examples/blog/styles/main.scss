@@ -1,0 +1,300 @@
+@import '~medium-editor/dist/css/medium-editor.css';
+@import '~medium-editor/dist/css/themes/default.css';
+
+$icon-font-path: "~bootstrap-sass/assets/fonts/bootstrap/";
+
+@import '~bootstrap-sass/assets/stylesheets/_bootstrap.scss';
+
+body {
+    background: #f8f8f8;
+}
+
+a {
+    color: #337ab7;
+    cursor: pointer;
+}
+
+pre.ascii {
+    border: none;
+    background: none;
+}
+
+.header {
+    @extend .navbar;
+    @extend .navbar-default;
+    @extend .navbar-static-top;
+
+    margin: 0;
+
+    h1 {
+        font-weight: normal;
+        margin: 0;
+        @extend .navbar-brand;
+
+        a {
+            color: #777;
+
+            &:hover {
+                text-decoration: none;
+            }
+        }
+    }
+}
+
+.sidebar {
+    position: absolute;
+    top: 0;
+    width: 250px;
+    margin-top: 51px;
+
+    ul {
+        @extend .nav;
+        li {
+            border-bottom: 1px solid #e7e7e7;
+            a {
+                display: block;
+                padding: 10px 15px;
+                .icon {
+                    margin-right: 4px;
+                }
+            }
+        }
+
+        &.collapsible {
+            max-height: 500px;
+            transition: max-height .25s ease-in;
+            overflow-y: hidden;
+        }
+
+        &.collapsed {
+            max-height: 0;
+            transition: max-height .15s ease-out;
+        }
+    }
+
+    .arrow {
+        color: #337ab7;
+        float: right;
+    }
+
+    .nav-second-level li {
+        border-bottom: 0!important;
+
+        a {
+            padding-left: 37px;
+        }
+    }
+
+    .sidebar-nav {
+        padding: 0;
+    }
+}
+
+.view-wrapper {
+    margin-left: 250px;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-bottom: 10px;
+    border-left: 1px solid #e7e7e7;
+    min-height: 568px;
+    background: #fff;
+
+    .page-header {
+        padding-top: 20px;
+        margin: 0 0 15px;
+        h1 {
+            margin-top: 0;
+        }
+        .description {
+            @extend .lead;
+            margin: 0;
+        }
+    }
+}
+
+.datagrid {
+    @extend .table;
+    @extend .table-condensed;
+    @extend .table-hover;
+    @extend .table-striped;
+
+    .sorted {
+        color: #aaa;
+        font-size: 13px;
+        margin-right: 4px;
+
+        &.sorted-asc {
+            @extend .glyphicon;
+            @extend .glyphicon-chevron-up;
+        }
+
+        &.sorted-desc {
+            @extend .glyphicon;
+            @extend .glyphicon-chevron-down;
+        }
+    }
+
+    .btn-default {
+        margin-right: 5px;
+    }
+}
+
+.reference-many-column, .choices-column {
+    .label {
+        margin-right: 5px;
+        font-weight: 400;
+        font-size: 12px;
+        padding-top: 4px;
+    }
+}
+.show-view {
+    .form-horizontal label {
+        padding-top: 0;
+    }
+}
+
+.boolean-true {
+    @extend .glyphicon;
+    @extend .glyphicon-ok;
+}
+
+.boolean-false {
+    @extend .glyphicon;
+    @extend .glyphicon-remove;
+}
+
+.pace-activity {
+    left: 50%;
+}
+
+.ma-view-actions {
+    margin: 25px 0 15px 0;
+    float: right;
+
+    a {
+        margin-left: 5px;
+    }
+}
+
+.pagination-bar {
+    text-align: right;
+    margin: 20px 0;
+
+    .total {
+        display: inline-block;
+        padding: 5px;
+    }
+
+    .pagination {
+        margin: 0 0 0 20px;
+    }
+}
+
+.dashboard-content {
+    .panel-default {
+
+        /* sb-admin uses the > selector, angular forces us to repeat the definition */
+        .panel-heading {
+            color: #333;
+            background-color: #f5f5f5;
+            border-color: #ddd;
+        }
+
+        table {
+            margin-bottom: 0;
+        }
+    }
+
+    .grid {
+        border: none;
+    }
+}
+
+/**
+ * Edition form
+ */
+.form-horizontal {
+
+    textarea {
+        height: 150px;
+    }
+
+    input[type="checkbox"], input[type="radio"] {
+        max-width: 16px;
+        box-shadow: none;
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .border-around {
+        margin-top: 2px;
+        background-color: #FFF;
+        background-image: none;
+        border: 1px solid #CCC;
+        border-radius: 4px;
+        -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+        -webkit-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        width: 100%;
+    }
+
+    .ta-toolbar button {
+        font-size: 12px;
+        padding: 5px 8px;
+
+        &.active {
+            z-index: 1;
+        }
+    }
+
+    &#show-view {
+        .label-default {
+            margin-right: 5px;
+            font-weight: normal;
+            font-size: 12px;
+            padding-top: 4px;
+        }
+
+        .control-label {
+            padding-top: 0;
+        }
+
+        .show-value {
+            .table {
+                margin: 0;
+
+                td {
+                    border-top: 0;
+                }
+            }
+        }
+    }
+
+    .CodeMirror {
+        border: 1px solid #CCC;
+        border-radius: 4px;
+    }
+
+    .wysiwyg-field {
+        height: auto;
+    }
+
+    .progressbar-container {
+      height: 10px;
+
+      .progressbar-progress {
+        transition: width 0.5s;
+        background-color: green;
+        height: 100%;
+      }
+    }
+}
+
+.filters {
+  a.remove {
+    padding-top: 10px;
+    display: block;
+  }
+}
