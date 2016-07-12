@@ -1,8 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
-import { hasEntityAndView, getView, onLoadFailure, onSendFailure } from '../Mixins/MainView';
-
 import Compile from '../Component/Compile';
 import Notification from '../Services/Notification';
 import NotFoundView from './NotFound';
@@ -13,56 +11,27 @@ import Field from '../Component/Field/Field';
 
 
 class EditView extends React.Component {
-    constructor(props, context) {
-        super(props, context);
-
-        this.hasEntityAndView = hasEntityAndView.bind(this);
-        this.getView = getView.bind(this);
-        this.onLoadFailure = onLoadFailure.bind(this);
-        this.onSendFailure = onSendFailure.bind(this);
-
-        this.actions = [];
-        this.viewName = 'EditView';
-        this.isValidEntityAndView = this.hasEntityAndView(this.props.routeParams.entity);
-    }
 
     componentDidMount() {
-        if (this.isValidEntityAndView) {
-            this.init(this.props.routeParams.entity, this.props.routeParams.id);
-        }
+        this.props.state.loadEditData(this.props.routeParams.entity, this.props.routeParams.id);
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.params.entity !== this.props.params.entity ||
             nextProps.params.id !== this.props.params.id) {
-
-            this.isValidEntityAndView = this.hasEntityAndView(nextProps.params.entity);
-            if (this.isValidEntityAndView) {
-                this.init(nextProps.params.entity, nextProps.params.id);
-            }
+            this.props.state.loadEditData(nextProps.params.entity, nextProps.params.id);
         }
     }
 
-    init(entityName, id) {
-        this.id = id;
-        this.view = this.getView();
-        this.actions = this.view.actions() || ['list'];
-        this.refreshData();
-    }
-
-    refreshData() {
-        this.props.state.loadEditData(this.view, this.id);
-    }
-
     updateField(name, value) {
-        const choiceFields = this.view.getFieldsOfType('choice');
+        const choiceFields = this.props.state.view.getFieldsOfType('choice');
 
         this.props.state.updateData(name, value, choiceFields);
     }
 
     save(e) {
         e.preventDefault();
-        this.props.state.saveData(this.view).then(this.onUpdated.bind(this));
+        this.props.state.saveData().then(this.onUpdated.bind(this));
     }
 
     onUpdated() {
@@ -90,7 +59,11 @@ class EditView extends React.Component {
     }
 
     render() {
-        if (!this.isValidEntityAndView || this.props.state.resourceNotFound) {
+        if (this.props.state.loading) {
+          return null;
+        }
+
+        if (this.props.state.resourceNotFound) {
             return <NotFoundView/>;
         }
 
@@ -100,8 +73,8 @@ class EditView extends React.Component {
             return null;
         }
 
-        const entityName = this.props.routeParams.entity;
-        const view = this.getView(entityName);
+        const entityName = this.props.state.entityName;
+        const view = this.props.state.view;
         const entry = dataStore.getFirstEntry(view.entity.uniqueId);
 
         if (!entry) {
@@ -110,7 +83,7 @@ class EditView extends React.Component {
 
         return (
             <div className="view edit-view">
-                <ViewActions entityName={entityName} entry={entry} buttons={this.actions} />
+                <ViewActions entityName={entityName} entry={entry} buttons={this.props.state.viewActions} />
 
                 <div className="page-header">
                     <h1><Compile entry={entry}>{view.title() || 'Edit one ' + entityName}</Compile></h1>
@@ -133,9 +106,5 @@ class EditView extends React.Component {
         );
     }
 }
-
-EditView.contextTypes = {
-    configuration: React.PropTypes.object.isRequired
-};
 
 export default EditView;

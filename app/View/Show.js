@@ -1,8 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
-import { hasEntityAndView, getView, onLoadFailure } from '../Mixins/MainView';
-
 import NotFoundView from './NotFound';
 
 import ViewActions from '../Component/ViewActions';
@@ -11,49 +9,20 @@ import Column from '../Component/Column/Column';
 
 @observer
 class ShowView extends React.Component {
-    constructor(props, context) {
-        super(props, context);
 
-        this.hasEntityAndView = hasEntityAndView.bind(this);
-        this.getView = getView.bind(this);
-        this.onLoadFailure = onLoadFailure.bind(this);
-
-        this.viewName = 'ShowView';
-        this.actions = [];
-        this.isValidEntityAndView = this.hasEntityAndView(this.props.routeParams.entity);
-    }
-
-    // componentDidMount() {
-    //     if (this.isValidEntityAndView) {
-    //
-    //         this.refreshData();
-    //     }
-    // }
-
-    init(entityName, id) {
-        this.view = this.getView(entityName);
-        this.actions = view.actions() || ['list', 'edit', 'delete'];
-
-        this.props.state.loadShowData(this.view, id);
+    componentDidMount() {
+        this.props.state.loadShowData(this.props.routeParams.entity, this.props.routeParams.id);
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.params.entity !== this.props.params.entity ||
             nextProps.params.id !== this.props.params.id) {
-
-            this.isValidEntityAndView = this.hasEntityAndView(nextProps.params.entity);
-            if (this.isValidEntityAndView) {
-                this.init(nextProps.params.entity, nextProps.params.id);
-            }
+            this.props.state.loadShowData(nextProps.params.entity, nextProps.params.id);
         }
     }
 
-    // onChange() {
-    //     this.setState(EntityStore.getState());
-    // }
-
     render() {
-        if (!this.isValidEntityAndView || this.props.state.resourceNotFound) {
+        if (this.props.state.resourceNotFound) {
             return <NotFoundView/>;
         }
 
@@ -64,10 +33,9 @@ class ShowView extends React.Component {
         }
 
         const entityName = this.props.state.entityName;
-        const view = this.getView(entityName);
+        const view = this.props.state.view;
 
         const entry = dataStore.getFirstEntry(view.getEntity().uniqueId);
-        const actions = this.actions;
 
         if (!entry) {
             return null;
@@ -75,7 +43,7 @@ class ShowView extends React.Component {
 
         return (
             <div className="view show-view">
-                <ViewActions entityName={entityName} entry={entry} buttons={actions} />
+                <ViewActions entityName={entityName} entry={entry} buttons={this.props.state.viewActions} />
 
                 <div className="page-header">
                     <h1>{view.title() || entityName + ' detail'}</h1>

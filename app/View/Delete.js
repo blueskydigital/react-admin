@@ -1,71 +1,40 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-
-import { hasEntityAndView, getView, onLoadFailure, onSendFailure } from '../Mixins/MainView';
+import { browserHistory } from 'react-router';
 
 import Compile from '../Component/Compile';
 import NotFoundView from './NotFound';
 
 import ViewActions from '../Component/ViewActions';
-
 import EntityStore from '../Stores/EntityStore';
 import Notification from '../Services/Notification';
 
 @observer
 class DeleteView extends React.Component {
-    constructor(props, context) {
-        super(props, context);
-
-        this.hasEntityAndView = hasEntityAndView.bind(this);
-        this.getView = getView.bind(this);
-        this.onLoadFailure = onLoadFailure.bind(this);
-        this.onSendFailure = onSendFailure.bind(this);
-
-        this.viewName = 'DeleteView';
-        this.actions = [];
-        this.isValidEntityAndView = this.hasEntityAndView(this.props.routeParams.entity);
-    }
 
     componentDidMount() {
-        if (this.isValidEntityAndView) {
-            this.init(this.props.routeParams.entity, this.props.routeParams.id);
-        }
+        this.props.state.loadDeleteData(this.props.routeParams.entity, this.props.routeParams.id);
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.params.entity !== this.props.params.entity ||
             nextProps.params.id !== this.props.params.id) {
-
-            this.isValidEntityAndView = this.hasEntityAndView(nextProps.params.entity);
-            if (this.isValidEntityAndView) {
-                this.init(nextProps.params.entity, nextProps.params.id);
-            }
+            this.props.state.loadDeleteData(nextProps.params.entity, nextProps.params.id);
         }
-    }
-
-    init(entityName, id) {
-        this.id = id;
-        this.view = this.getView();
-        this.actions = this.view.actions() || ['back'];
-        this.refreshData();
-    }
-
-    refreshData() {
-        this.props.state.loadDeleteData(this.view, this.id);
     }
 
     delete(e) {
         e.preventDefault();
-        this.props.state.deleteData(this.view, this.id).then(this.onDeleted.bind(this));
+        const state = this.props.state;
+        this.props.state.deleteData().then(this.onDeleted.bind(this));
     }
 
     onDeleted() {
-        const params = this.props.routeParams;
-        const entityName = params.entity;
+        const entityName = this.props.state.entityName;
 
         Notification.log('Element successfully deleted.', { addnCls: 'humane-flatty-success' });
 
-        this.props.history.push(`/${entityName}/list`);
+        browserHistory.push(`/${entityName}/list`);
     }
 
     cancelDelete() {
@@ -73,18 +42,19 @@ class DeleteView extends React.Component {
     }
 
     render() {
-        if (!this.isValidEntityAndView || this.props.state.resourceNotFound) {
+        if (this.props.state.resourceNotFound) {
             return <NotFoundView/>;
         }
 
         const dataStore = this.props.state.dataStore;
 
-        if(!dataStore || !this.view) {
+        if(! dataStore) {
             return null;
         }
 
-        const entityName = this.props.routeParams.entity;
-        const entry = dataStore.getFirstEntry(this.view.entity.uniqueId);
+        const entityName = this.props.state.entityName;
+        const view = this.props.state.view;
+        const entry = dataStore.getFirstEntry(view.entity.uniqueId);
 
         if (!entry) {
             return null;
@@ -94,11 +64,11 @@ class DeleteView extends React.Component {
             <div>
                 <div className="row">
                     <div className="col-lg-12">
-                        <ViewActions entityName={this.view.entity.name()} buttons={this.actions} />
+                        <ViewActions entityName={entityName} buttons={this.props.state.viewActions} />
 
                         <div className="page-header">
-                            <h1><Compile entry={entry}>{this.view.title() || 'Delete one ' + entityName}</Compile></h1>
-                            <p className="description"><Compile entry={entry}>{this.view.description()}</Compile></p>
+                            <h1><Compile entry={entry}>{view.title() || 'Delete one ' + entityName}</Compile></h1>
+                            <p className="description"><Compile entry={entry}>{view.description()}</Compile></p>
                         </div>
                     </div>
                 </div>
@@ -114,9 +84,5 @@ class DeleteView extends React.Component {
         );
     }
 }
-
-DeleteView.contextTypes = {
-    configuration: React.PropTypes.object.isRequired
-};
 
 export default DeleteView;

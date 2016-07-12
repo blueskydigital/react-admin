@@ -1,7 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-
-import { hasEntityAndView, getView, onLoadFailure, onSendFailure } from '../Mixins/MainView';
+import { browserHistory } from 'react-router';
 
 import Compile from '../Component/Compile';
 import Notification from '../Services/Notification';
@@ -13,41 +12,15 @@ import Field from '../Component/Field/Field';
 
 @observer
 class CreateView extends React.Component {
-    constructor(props, context) {
-        super(props, context);
-
-        this.hasEntityAndView = hasEntityAndView.bind(this);
-        this.getView = getView.bind(this);
-
-        this.viewName = 'CreateView';
-        this.actions = [];
-        this.isValidEntityAndView = this.hasEntityAndView(this.props.routeParams.entity);
-    }
 
     componentDidMount() {
-        if (this.isValidEntityAndView) {
-            this.init();
-        }
+        this.props.state.loadCreateData(this.props.routeParams.entity);
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.params.entity !== this.props.params.entity) {
-
-            this.isValidEntityAndView = this.hasEntityAndView(nextProps.params.entity);
-            if (this.isValidEntityAndView) {
-                this.init(nextProps.params.entity);
-            }
+            this.props.state.loadCreateData(nextProps.params.entity);
         }
-    }
-
-    init() {
-        this.view = this.getView();
-        this.actions = this.view.actions() || ['list'];
-        this.refreshData();
-    }
-
-    refreshData() {
-        this.props.state.loadCreateData(this.view);
     }
 
     updateField(name, value) {
@@ -56,17 +29,17 @@ class CreateView extends React.Component {
 
     save(e) {
         e.preventDefault();
-        this.props.state.saveData(this.view).then(this.onCreated.bind(this));
+        this.props.state.saveData(this.props.state.view).then(this.onCreated.bind(this));
     }
 
     onCreated(dataStore) {
-        const entityName = this.props.routeParams.entity;
-        const entry = dataStore.getFirstEntry(this.getView(entityName).entity.uniqueId);
+        const entityName = this.props.state.entityName;
+        const entry = dataStore.getFirstEntry(this.props.state.view.entity.uniqueId);
 
         Notification.log('Element successfully created.', {addnCls: 'humane-flatty-success'});
 
         const to = `/${entityName}/edit/${entry.identifierValue}`;
-        this.props.history.push(to);
+        browserHistory.push(to);
     }
 
     buildFields(view, entry, dataStore) {
@@ -90,7 +63,7 @@ class CreateView extends React.Component {
     }
 
     render() {
-        if (!this.isValidEntityAndView || this.props.state.resourceNotFound) {
+        if (this.props.state.resourceNotFound) {
             return <NotFoundView/>;
         }
 
@@ -100,8 +73,8 @@ class CreateView extends React.Component {
             return null;
         }
 
-        const entityName = this.props.routeParams.entity;
-        const view = this.getView(entityName);
+        const entityName = this.props.state.entityName;
+        const view = this.props.state.view;
         const entry = dataStore.getFirstEntry(view.entity.uniqueId);
 
         if (!entry) {
@@ -110,7 +83,9 @@ class CreateView extends React.Component {
 
         return (
             <div className="view create-view">
-                <ViewActions entityName={entityName} entry={entry} buttons={this.actions} />
+                <ViewActions entityName={entityName} entry={entry}
+                    buttons={this.props.state.viewActions}
+                />
 
                 <div className="page-header">
                     <h1><Compile entry={entry}>{view.title() || 'Create new ' + entityName}</Compile></h1>
@@ -135,9 +110,5 @@ class CreateView extends React.Component {
         );
     }
 }
-
-CreateView.contextTypes = {
-    configuration: React.PropTypes.object.isRequired
-};
 
 export default CreateView;

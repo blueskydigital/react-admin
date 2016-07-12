@@ -38,7 +38,8 @@ class ReactAdmin extends React.Component {
         routes.props.children.push(<Route path="*" component={NotFoundView} />);
 
         this.store = new EntityStore(
-          new EntryRequester(configuration, new RestWrapper(restful))
+          new EntryRequester(configuration, new RestWrapper(restful)),
+          configuration
         );
         this.configuration = configuration;
     }
