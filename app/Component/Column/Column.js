@@ -1,4 +1,5 @@
 import React from 'react';
+import { browserHistory } from 'react-router';
 
 import Compile from '../Compile';
 import FieldViewConfiguration from '../../Field/FieldViewConfiguration';
@@ -11,7 +12,7 @@ class Column extends React.Component {
             const route = entity.editionView().enabled ? 'edit' : 'show';
 
             const to = `/${entityName}/${route}/${entry.identifierValue}`;
-            this.props.history.push(to);
+            browserHistory.push(to);
         }.bind(this);
     }
 
@@ -63,7 +64,6 @@ Column.propTypes = {
 };
 
 Column.contextTypes = {
-    router: React.PropTypes.object.isRequired,
     configuration: React.PropTypes.object.isRequired
 };
 
