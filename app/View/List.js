@@ -1,7 +1,6 @@
 import React from 'react';
-import { shouldComponentUpdate } from 'react/lib/ReactComponentWithPureRenderMixin';
-import debounce from 'lodash/function/debounce';
-import { List } from 'immutable';
+import { observer } from 'mobx-react';
+import { browserHistory } from 'react-router'
 
 import { hasEntityAndView, getView, onLoadFailure } from '../Mixins/MainView';
 
@@ -10,84 +9,48 @@ import NotFoundView from './NotFound';
 import Datagrid from '../Component/Datagrid/Datagrid';
 import MaDatagridPagination from '../Component/Datagrid/MaDatagridPagination';
 import ViewActions from '../Component/ViewActions';
-import Compile from '../Component/Compile';
-
-import ApplicationActions from '../Actions/ApplicationActions';
-import ApplicationStore from '../Stores/ApplicationStore';
-import EntityActions from '../Actions/EntityActions';
-import EntityStore from '../Stores/EntityStore';
 
 import Filters from '../Component/Datagrid/Filters';
 
+@observer
 class ListView extends React.Component {
-    constructor(props, context) {
-        super(props, context);
+    constructor(props) {
+        super(props);
 
-        this.state = {}; // needed for ReactComponentWithPureRenderMixin::shouldComponentUpdate()
-
-        this.shouldComponentUpdate = shouldComponentUpdate.bind(this);
         this.hasEntityAndView = hasEntityAndView.bind(this);
         this.getView = getView.bind(this);
         this.onLoadFailure = onLoadFailure.bind(this);
-
-        this.boundedUpdateFilterField = this.updateFilterField.bind(this);
-        this.boundedShowFilter = this.showFilter.bind(this);
-        this.boundedHideFilter = this.hideFilter.bind(this);
-        this.boundedOnListSort = this.onListSort.bind(this);
-        this.boundedOnPageChange = this.onPageChange.bind(this);
-
-        this.refreshList = debounce(this.refreshList.bind(this), 300);
-
         this.viewName = 'ListView';
+        this.actions = [];
         this.isValidEntityAndView = this.hasEntityAndView(this.props.routeParams.entity);
     }
 
     componentDidMount() {
-        this.boundedOnChange = this.onChange.bind(this);
-        EntityStore.addChangeListener(this.boundedOnChange);
-        EntityStore.addReadFailureListener(this.onLoadFailure);
-
-        this.boundedOnChangeFilters = this.onChangeFilters.bind(this);
-        ApplicationStore.addFilterListener(this.boundedOnChangeFilters);
-
         if (this.isValidEntityAndView) {
             this.init();
         }
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.params.entity !== this.props.params.entity ||
-            nextProps.query.page !== this.props.query.page ||
-            nextProps.query.sortField !== this.props.query.sortField ||
-            nextProps.query.sortDir !== this.props.query.sortDir) {
-
+        if (nextProps.params.entity !== this.props.params.entity) {
             this.isValidEntityAndView = this.hasEntityAndView(nextProps.params.entity);
             if (this.isValidEntityAndView) {
-                this.init();
+                this.init(nextProps.params.entity);
             }
+        } else if(nextProps.location.query.page !== this.props.location.query.page) {
+            this.props.state.updatePage(nextProps.location.query.page);
+        } else if(nextProps.location.query.sortField !== this.props.location.query.sortField ||
+            nextProps.location.query.sortDir !== this.props.location.query.sortDir) {
+            this.props.state.updateSort(nextProps.location.query.sortField, nextProps.location.query.sortDir);
         }
     }
 
-    componentWillUnmount() {
-        EntityStore.removeChangeListener(this.boundedOnChange);
-        EntityStore.removeReadFailureListener(this.onLoadFailure);
+    init(entityName) {
+        this.view = this.getView(entityName);
+        this.actions = this.view.actions() || ['create'];
 
-        ApplicationStore.removeFilterListener(this.boundedOnChangeFilters);
-    }
-
-    init() {
-        this.actions = List(this.getView().actions() || ['create']);
-
-        this.refreshData();
         this.initFilters();
-    }
-
-    onChange() {
-        this.setState({ entity: EntityStore.getState().data });
-    }
-
-    onChangeFilters() {
-        this.setState({ application: ApplicationStore.getState().data });
+        this.props.state.loadListData(this.view);
     }
 
     initFilters() {
@@ -107,17 +70,15 @@ class ListView extends React.Component {
                 unselected.push(filter);
             }
         }
-
-        ApplicationActions.initFilters({ selected, unselected });
     }
 
     showFilter(filter) {
-        ApplicationActions.showFilter(filter);
+        // ApplicationActions.showFilter(filter);
     }
 
     hideFilter(filter) {
         return () => {
-            ApplicationActions.hideFilter(filter);
+            // ApplicationActions.hideFilter(filter);
             this.updateFilterField(filter.name(), null);
         };
     }
@@ -156,59 +117,60 @@ class ListView extends React.Component {
     }
 
     onListSort(field, dir) {
-        let query = this.props.location.query || {};
-        query.sortField = field;
-        query.sortDir = dir;
+        this._changeQuery({sortDir: dir, sortField: field});
+    }
 
-        this.refreshList(query);
+    _changeQuery(newquery) {
+        let query = Object.assign({}, this.props.location.query || {});
+        Object.assign(query, newquery);
+        const serialized = Object.keys(query).reduce( (a,k) => {
+            a.push(k + '=' + encodeURIComponent(query[k]));
+            return a
+        }, []).join('&');
+
+        browserHistory.push(`${this.props.location.pathname}?${serialized}`);
     }
 
     onPageChange(page) {
-        let query = this.props.location.query || {};
-        query.page = page;
-
-        this.refreshList(query);
-    }
-
-    refreshList(query) {
-        const entityName = this.getView().entity.name();
-
-        this.props.history.push(`/${entityName}/list?${query}`);
-        this.refreshData();
-    }
-
-    refreshData() {
-        const { page, sortField, sortDir, search } = this.props.location.query || {};
-
-        EntityActions.loadListData(this.context.restful, this.context.configuration, this.getView(), page, sortField, sortDir, search);
+        this._changeQuery({page: page});
     }
 
     buildPagination(view) {
-        const totalItems = this.state.entity.get('totalItems');
-        const page = +this.state.entity.get('page');
+        const totalItems = this.props.state.totalItems;
+        const page = +this.props.state.page;
 
-        return <MaDatagridPagination totalItems={totalItems} page={page} perPage={view.perPage()} onChange={this.boundedOnPageChange} />;
+        return <MaDatagridPagination totalItems={totalItems} page={page}
+          perPage={view.perPage()} onChange={this.onPageChange.bind(this)} />;
+    }
+
+    buildFilters() {
+      // if (!filters.get('selected').isEmpty()) {
+      //     filter = (
+      //         <Filters
+      //             filters={filters.get('selected')}
+      //             entity={view.entity}
+      //             dataStore={dataStore}
+      //             hideFilter={this.boundedHideFilter}
+      //             updateField={this.boundedUpdateFilterField} />
+      //         );
+      // }
     }
 
     render() {
-        if (!this.isValidEntityAndView) {
+        if (!this.isValidEntityAndView || this.props.state.resourceNotFound) {
             return <NotFoundView/>;
         }
 
-        if (!this.state.hasOwnProperty('application') || !this.state.hasOwnProperty('entity')) {
-            return null;
-        }
-
-        if (this.state.entity.get('resourceNotFound')) {
-            return <NotFoundView/>;
-        }
-
-        const entityName = this.props.routeParams.entity;
+        const entityName = this.props.state.entityName;
         const view = this.getView(entityName);
-        const filters = this.state.application.get('filters');
-        const sortDir = this.state.entity.get('sortDir');
-        const sortField = this.state.entity.get('sortField');
-        const dataStore = this.state.entity.getIn(['dataStore', 'object']);
+        const filters = this.props.state.filters;
+        const sortDir = this.props.state.sortDir;
+        const sortField = this.props.state.sortField;
+        const dataStore = this.props.state.dataStore;
+        const unselected = []; // filters.get('unselected')
+        if(!dataStore) {
+          return null;
+        }
         const entries = dataStore.getEntries(view.entity.uniqueId);
         let datagrid = null;
         let filter = null;
@@ -217,26 +179,15 @@ class ListView extends React.Component {
             datagrid = (
                 <Datagrid
                     name={view.name()}
-                    entityName={view.entity.name()}
+                    entityName={this.props.state.entityName}
                     listActions={view.listActions()}
                     fields={view.getFields()}
                     entries={entries}
                     sortDir={sortDir}
                     sortField={sortField}
-                    onSort={this.boundedOnListSort}
+                    onSort={this.onListSort.bind(this)}
                 />
             );
-        }
-
-        if (!filters.get('selected').isEmpty()) {
-            filter = (
-                <Filters
-                    filters={filters.get('selected')}
-                    entity={view.entity}
-                    dataStore={dataStore}
-                    hideFilter={this.boundedHideFilter}
-                    updateField={this.boundedUpdateFilterField} />
-                );
         }
 
         return (
@@ -244,15 +195,15 @@ class ListView extends React.Component {
                 <ViewActions
                     entityName={view.entity.name()}
                     buttons={this.actions}
-                    filters={filters.get('unselected')}
+                    filters={unselected}
                     showFilter={this.boundedShowFilter} />
 
                 <div className="page-header">
-                    <h1><Compile>{view.title() || entityName + ' list'}</Compile></h1>
-                    <p className="description"><Compile>{view.description()}</Compile></p>
+                    <h1>{view.title() || entityName + ' list'}</h1>
+                    <p className="description">{view.description()}</p>
                 </div>
 
-                {filter}
+                {this.buildFilters()}
 
                 {datagrid}
 
@@ -263,7 +214,6 @@ class ListView extends React.Component {
 }
 
 ListView.contextTypes = {
-    restful: React.PropTypes.func.isRequired,
     configuration: React.PropTypes.object.isRequired
 };
 

@@ -1,90 +1,73 @@
 import React from 'react';
-import Inflector from 'inflected';
-import { shouldComponentUpdate } from 'react/lib/ReactComponentWithPureRenderMixin';
-import { List } from 'immutable';
+import { observer } from 'mobx-react';
 
 import { hasEntityAndView, getView, onLoadFailure } from '../Mixins/MainView';
 
 import NotFoundView from './NotFound';
 
 import ViewActions from '../Component/ViewActions';
-import EntityActions from '../Actions/EntityActions';
 import EntityStore from '../Stores/EntityStore';
 import Column from '../Component/Column/Column';
-import Compile from '../Component/Compile';
 
+@observer
 class ShowView extends React.Component {
     constructor(props, context) {
         super(props, context);
 
-        this.state = {}; // needed for ReactComponentWithPureRenderMixin::shouldComponentUpdate()
-
-        this.shouldComponentUpdate = shouldComponentUpdate.bind(this);
         this.hasEntityAndView = hasEntityAndView.bind(this);
         this.getView = getView.bind(this);
         this.onLoadFailure = onLoadFailure.bind(this);
 
         this.viewName = 'ShowView';
+        this.actions = [];
         this.isValidEntityAndView = this.hasEntityAndView(this.props.routeParams.entity);
     }
 
-    componentDidMount() {
-        this.boundedOnChange = this.onChange.bind(this);
-        EntityStore.addChangeListener(this.boundedOnChange);
-        EntityStore.addReadFailureListener(this.onLoadFailure);
+    // componentDidMount() {
+    //     if (this.isValidEntityAndView) {
+    //
+    //         this.refreshData();
+    //     }
+    // }
 
-        if (this.isValidEntityAndView) {
-            this.refreshData();
-        }
+    init(entityName, id) {
+        this.view = this.getView(entityName);
+        this.actions = view.actions() || ['list', 'edit', 'delete'];
+
+        this.props.state.loadShowData(this.view, id);
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.params.entity !== this.props.params.entity ||
-            nextProps.params.id !== this.props.params.id ||
-            nextProps.query.sortField !== this.props.query.sortField ||
-            nextProps.query.sortDir !== this.props.query.sortDir) {
+            nextProps.params.id !== this.props.params.id) {
 
             this.isValidEntityAndView = this.hasEntityAndView(nextProps.params.entity);
             if (this.isValidEntityAndView) {
-                this.refreshData();
+                this.init(nextProps.params.entity, nextProps.params.id);
             }
         }
     }
 
-    componentWillUnmount() {
-        EntityStore.removeChangeListener(this.boundedOnChange);
-        EntityStore.removeReadFailureListener(this.onLoadFailure);
-    }
-
-    onChange() {
-        this.setState(EntityStore.getState());
-    }
-
-    refreshData() {
-        const {id} = this.props.routeParams;
-        const {sortField, sortDir} = this.props.location.query || {};
-
-        EntityActions.loadShowData(this.context.restful, this.context.configuration, this.getView(), id, sortField, sortDir);
-    }
+    // onChange() {
+    //     this.setState(EntityStore.getState());
+    // }
 
     render() {
-        if (!this.isValidEntityAndView) {
+        if (!this.isValidEntityAndView || this.props.state.resourceNotFound) {
             return <NotFoundView/>;
         }
 
-        if (!this.state.hasOwnProperty('data')) {
+        const dataStore = this.props.state.dataStore;
+
+        if(!dataStore) {
             return null;
         }
 
-        if (this.state.data.get('resourceNotFound')) {
-            return <NotFoundView/>;
-        }
-
-        const entityName = this.props.routeParams.entity;
+        const entityName = this.props.state.entityName;
         const view = this.getView(entityName);
-        const dataStore = this.state.data.getIn(['dataStore', 'object']);
+
         const entry = dataStore.getFirstEntry(view.getEntity().uniqueId);
-        const actions = List(view.actions() || ['list', 'edit', 'delete']);
+        const actions = this.actions;
 
         if (!entry) {
             return null;
@@ -92,11 +75,11 @@ class ShowView extends React.Component {
 
         return (
             <div className="view show-view">
-                <ViewActions entityName={view.entity.name()} entry={entry} buttons={actions} />
+                <ViewActions entityName={entityName} entry={entry} buttons={actions} />
 
                 <div className="page-header">
-                    <h1><Compile>{view.title() || Inflector.singularize(entityName) + ' detail'}</Compile></h1>
-                    <p className="description"><Compile>{view.description()}</Compile></p>
+                    <h1>{view.title() || entityName + ' detail'}</h1>
+                    <p className="description">{view.description()}</p>
                 </div>
 
                 <div className="row form-horizontal" id="show-view">
@@ -114,10 +97,5 @@ class ShowView extends React.Component {
         );
     }
 }
-
-ShowView.contextTypes = {
-    restful: React.PropTypes.func.isRequired,
-    configuration: React.PropTypes.object.isRequired
-};
 
 export default ShowView;

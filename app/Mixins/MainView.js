@@ -1,5 +1,5 @@
 import Notification from '../Services/Notification';
-import EntityActions from '../Actions/EntityActions';
+// import EntityActions from '../Actions/EntityActions';
 
 export function hasEntityAndView(entityName) {
     try {

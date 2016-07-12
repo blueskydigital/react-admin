@@ -5,7 +5,7 @@ class ChoiceField extends React.Component {
     render() {
         let choices = this.props.field.choices();
         if ('function' === typeof choices) {
-            choices = choices({ values: this.props.values.toJS() });
+            choices = choices({ values: this.props.values });
         }
 
         return (

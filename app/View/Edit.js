@@ -1,8 +1,5 @@
 import React from 'react';
-import { shouldComponentUpdate } from 'react/lib/ReactComponentWithPureRenderMixin';
-import Inflector from 'inflected';
-import debounce from 'lodash/function/debounce';
-import { List } from 'immutable';
+import { observer } from 'mobx-react';
 
 import { hasEntityAndView, getView, onLoadFailure, onSendFailure } from '../Mixins/MainView';
 
@@ -11,106 +8,80 @@ import Notification from '../Services/Notification';
 import NotFoundView from './NotFound';
 
 import ViewActions from '../Component/ViewActions';
-import EntityActions from '../Actions/EntityActions';
 import EntityStore from '../Stores/EntityStore';
 import Field from '../Component/Field/Field';
+
 
 class EditView extends React.Component {
     constructor(props, context) {
         super(props, context);
 
-        this.state = {}; // needed for ReactComponentWithPureRenderMixin::shouldComponentUpdate()
-
-        this.shouldComponentUpdate = shouldComponentUpdate.bind(this);
         this.hasEntityAndView = hasEntityAndView.bind(this);
         this.getView = getView.bind(this);
         this.onLoadFailure = onLoadFailure.bind(this);
         this.onSendFailure = onSendFailure.bind(this);
-        this.updateField = debounce(this.updateField.bind(this), 300);
 
+        this.actions = [];
         this.viewName = 'EditView';
         this.isValidEntityAndView = this.hasEntityAndView(this.props.routeParams.entity);
     }
 
     componentDidMount() {
-        this.boundedOnChange = this.onChange.bind(this);
-        EntityStore.addChangeListener(this.boundedOnChange);
-
-        this.boundedOnUpdate = this.onUpdate.bind(this);
-        EntityStore.addUpdateListener(this.boundedOnUpdate);
-
-        EntityStore.addReadFailureListener(this.onLoadFailure);
-        EntityStore.addWriteFailureListener(this.onSendFailure);
-
         if (this.isValidEntityAndView) {
-            this.init();
+            this.init(this.props.routeParams.entity, this.props.routeParams.id);
         }
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.params.entity !== this.props.params.entity ||
-            nextProps.params.id !== this.props.params.id ||
-            nextProps.query.sortField !== this.props.query.sortField ||
-            nextProps.query.sortDir !== this.props.query.sortDir) {
+            nextProps.params.id !== this.props.params.id) {
 
             this.isValidEntityAndView = this.hasEntityAndView(nextProps.params.entity);
             if (this.isValidEntityAndView) {
-                this.init();
+                this.init(nextProps.params.entity, nextProps.params.id);
             }
         }
     }
 
-    componentWillUnmount() {
-        EntityStore.removeChangeListener(this.boundedOnChange);
-        EntityStore.removeUpdateListener(this.boundedOnUpdate);
-        EntityStore.removeReadFailureListener(this.onLoadFailure);
-        EntityStore.removeWriteFailureListener(this.onSendFailure);
-    }
-
-    init() {
-        this.actions = List(this.getView().actions() || ['list', 'delete']);
+    init(entityName, id) {
+        this.id = id;
+        this.view = this.getView();
+        this.actions = this.view.actions() || ['list'];
         this.refreshData();
     }
 
-    onChange() {
-        this.setState(EntityStore.getState());
-    }
-
-    onUpdate() {
-        Notification.log('Changes successfully saved.', { addnCls: 'humane-flatty-success' });
-    }
-
     refreshData() {
-        const {id} = this.props.routeParams;
-        const {sortField, sortDir} = this.props.routeParams || {};
-
-        EntityActions.loadEditData(this.context.restful, this.context.configuration, this.getView(), id, sortField, sortDir);
+        this.props.state.loadEditData(this.view, this.id);
     }
 
     updateField(name, value) {
-        const choiceFields = this.getView().getFieldsOfType('choice');
+        const choiceFields = this.view.getFieldsOfType('choice');
 
-        EntityActions.updateData(name, value, choiceFields);
+        this.props.state.updateData(name, value, choiceFields);
     }
 
     save(e) {
         e.preventDefault();
+        this.props.state.saveData(this.view).then(this.onUpdated.bind(this));
+    }
 
-        EntityActions.saveData(this.context.restful, this.context.configuration, this.getView());
+    onUpdated() {
+        Notification.log('Changes successfully saved.', { addnCls: 'humane-flatty-success' });
     }
 
     buildFields(view, entry, dataStore) {
         let fields = [];
-        const values = this.state.data.get('values');
+        const values = this.props.state.values;
 
         for (let field of view.getFields()) {
-            const value = this.state.data.getIn(['values', field.name()]);
+            const value = values[field.name()];
 
             fields.push(
                 <div className="form-field form-group" key={field.order()}>
                     <Field field={field} value={value} values={values}
-                           entity={view.getEntity()} entry={entry}
-                           dataStore={dataStore} updateField={this.updateField} />
+                           entity={view.entity} entry={entry}
+                           dataStore={dataStore}
+                           updateField={this.updateField.bind(this)} />
                 </div>
             );
         }
@@ -119,21 +90,18 @@ class EditView extends React.Component {
     }
 
     render() {
-        if (!this.isValidEntityAndView) {
+        if (!this.isValidEntityAndView || this.props.state.resourceNotFound) {
             return <NotFoundView/>;
         }
 
-        if (!this.state.hasOwnProperty('data')) {
+        const dataStore = this.props.state.dataStore;
+
+        if(!dataStore) {
             return null;
-        }
-
-        if (this.state.data.get('resourceNotFound')) {
-            return <NotFoundView/>;
         }
 
         const entityName = this.props.routeParams.entity;
         const view = this.getView(entityName);
-        const dataStore = this.state.data.get('dataStore').first();
         const entry = dataStore.getFirstEntry(view.entity.uniqueId);
 
         if (!entry) {
@@ -142,10 +110,10 @@ class EditView extends React.Component {
 
         return (
             <div className="view edit-view">
-                <ViewActions entityName={view.entity.name()} entry={entry} buttons={this.actions} />
+                <ViewActions entityName={entityName} entry={entry} buttons={this.actions} />
 
                 <div className="page-header">
-                    <h1><Compile entry={entry}>{view.title() || 'Edit one ' + Inflector.singularize(entityName)}</Compile></h1>
+                    <h1><Compile entry={entry}>{view.title() || 'Edit one ' + entityName}</Compile></h1>
                     <p className="description"><Compile>{view.description()}</Compile></p>
                 </div>
 
@@ -167,7 +135,6 @@ class EditView extends React.Component {
 }
 
 EditView.contextTypes = {
-    restful: React.PropTypes.func.isRequired,
     configuration: React.PropTypes.object.isRequired
 };
 

@@ -11,11 +11,15 @@ import autoload from './autoloader'
 import routes from './routes'
 import NotFoundView from './View/NotFound';
 
+import RestWrapper from './Services/RestWrapper';
+import EntryRequester from './Services/EntryRequester';
+import EntityStore from './Stores/EntityStore';
+
 import Pace from 'pace';
 
 class ReactAdmin extends React.Component {
-    constructor(props, context) {
-        super(props, context);
+    constructor(props) {
+        super(props);
 
         const restful = Restful();
         const components = {
@@ -33,21 +37,20 @@ class ReactAdmin extends React.Component {
         // add default route
         routes.props.children.push(<Route path="*" component={NotFoundView} />);
 
-        this.state = {
-            configuration: configuration,
-            restful: restful
-        };
-        this.loaded = true;
+        this.store = new EntityStore(
+          new EntryRequester(configuration, new RestWrapper(restful))
+        );
+        this.configuration = configuration;
     }
 
-    componentDidUpdate() {
-        // stop progress bar
-        Pace.stop();
-    }
+    // componentDidUpdate() {
+    //     // stop progress bar
+    //     Pace.stop();
+    // }
 
     render() {
-        // start progress bar
-        Pace.start();
+        // // start progress bar
+        // Pace.start();
 
         // custom creation fn to pass down config to every component
         // Component wrapper:
@@ -55,10 +58,10 @@ class ReactAdmin extends React.Component {
         //
         // Custom createElement:
         // https://github.com/reactjs/react-router/issues/1857
-        let state = this.state;
+        const config = this.configuration;
+        const store = this.store;
         var createElement = function (Component, props) {
-          return <Component {...props}
-            configuration={state.configuration} restful={state.restful} />
+          return <Component {...props} configuration={config} state={store} />
         };
 
         return (

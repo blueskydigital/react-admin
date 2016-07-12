@@ -5,7 +5,8 @@ export default class EntityStore {
 
   @observable panels = [];
   @observable originEntityId = null;
-  @observable values = [];
+  @observable entityName = null;
+  @observable values = {};
   @observable dataStore = null;
   @observable totalItems = 0;
   @observable page = 1;
@@ -15,6 +16,8 @@ export default class EntityStore {
   @observable selected = [];
   @observable resourceNotFound = false;
   @observable loading = false;
+
+  _view = null;
 
   constructor(requester) {
     this.requester = requester;
@@ -26,8 +29,46 @@ export default class EntityStore {
   // }
 
   @action
+  updatePage(page) {
+    this.loading = true;
+    return this.requester.getEntries(new DataStore(), this._view, page, {
+      references: true,
+      choices: true,
+      sortField: this.sortField,
+      sortDir: this.sortDir,
+      filters: this.filters
+    }).then((collection) => {
+      transaction(() => {
+        this.page = page;
+        this.dataStore = collection.dataStore;
+        this.loading = false;
+      });
+    });
+  }
+
+  @action
+  updateSort(sortField, sortDir) {
+    this.loading = true;
+    return this.requester.getEntries(new DataStore(), this._view, this.page, {
+      references: true,
+      choices: true,
+      sortField: sortField,
+      sortDir: sortDir,
+      filters: this.filters
+    }).then((collection) => {
+      transaction(() => {
+        this.sortField = sortField;
+        this.sortDir = sortDir;
+        this.dataStore = collection.dataStore;
+        this.loading = false;
+      });
+    });
+  }
+
+  @action
   loadListData(view, page = 1, sortField = null, sortDir = null, filters = null) {
     this.loading = true;
+    this._view = view;
 
     return this.requester.getEntries(new DataStore(), view, page, {
       references: true,
@@ -37,6 +78,7 @@ export default class EntityStore {
       filters
     }).then((collection) => {
       transaction(() => {
+        this.entityName = view.entity.name();
         this.page = page;
         this.sortField = sortField;
         this.sortDir = sortDir;
@@ -83,7 +125,7 @@ export default class EntityStore {
   }
 
   @action
-  loadCreateData(restful, configuration, view) {
+  loadCreateData(view) {
     this.requester.createEntry(view)
     .then((dataStore) => {
       transaction(() => {
@@ -91,7 +133,8 @@ export default class EntityStore {
         this.dataStore = dataStore;
         let entry = dataStore.getFirstEntry(view.entity.uniqueId);
         for (let fieldName in entry.values) {
-          this.values[fieldName] = entry.values[fieldName];
+          const field = entry.values[fieldName];
+          this.values[field.name()] = field.defaultValue();
         }
       });
     });
@@ -123,18 +166,18 @@ export default class EntityStore {
 
             let choices = field.choices();
             if ('function' === typeof choices) {
-                choices = choices({ values: this.data.get('values').toJS() });
+                choices = choices({ values: this.values });
             }
 
             let valueInChoices = false;
             choices.map((v) => {
-                if (v.value === this.data.getIn(['values', field.name()])) {
+                if (v.value === this.values[field.name()]) {
                     valueInChoices = true;
                 }
             });
 
             if (!valueInChoices) {
-                this.data = this.data.updateIn(['values', field.name()], () => null);
+                this.values[field.name()] = null;
             }
         });
     }
@@ -146,24 +189,25 @@ export default class EntityStore {
     const id = this.originEntityId;
 
     let rawEntry = {};
-    for (let [name, value] of this.values) {
-        rawEntry[name] = value;
+    for (let name in this.values) {
+        rawEntry[name] = this.values[name];
     }
 
-    this.requester
+    return this.requester
       .saveEntry(this.dataStore, view, rawEntry, id)
       .then((dataStore) => {
         transaction(() => {
           this.dataStore = dataStore;
           this.loading = false;
         });
+        return dataStore;
       });
   }
 
   @action
-  deleteData(id, view) {
+  deleteData(view, id) {
     this.loading = true;
-    this.requester.deleteEntry(view, id).then(() => {
+    return this.requester.deleteEntry(view, id).then(() => {
       this.loading = false;
     });
   }

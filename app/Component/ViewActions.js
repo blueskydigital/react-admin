@@ -1,15 +1,9 @@
 import React from 'react';
-import { shouldComponentUpdate } from 'react/lib/ReactComponentWithPureRenderMixin';
 import Compile from './Compile';
 
 import { FilterButton, MaBackButton, MaCreateButton, MaShowButton, MaEditButton, MaDeleteButton, MaListButton } from './Button';
 
 class ViewActions extends React.Component {
-    constructor(props, context) {
-        super(props, context);
-
-        this.shouldComponentUpdate = shouldComponentUpdate.bind(this);
-    }
 
     render() {
         const { size, entityName, buttons, entry, view, filters, showFilter } = this.props;
@@ -62,7 +56,7 @@ class ViewActions extends React.Component {
 ViewActions.propTypes = {
     entityName: React.PropTypes.string,
     entry: React.PropTypes.object,
-    buttons: React.PropTypes.object.isRequired,
+    buttons: React.PropTypes.array.isRequired,
     size: React.PropTypes.string,
     view: React.PropTypes.object,
     filters: React.PropTypes.object,

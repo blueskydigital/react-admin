@@ -1,4 +1,5 @@
 import React from 'react';
+import { observer } from 'mobx-react';
 import {RouteHandler, Link} from 'react-router';
 
 import Header from './View/Common/Header';
@@ -39,11 +40,12 @@ FieldViewConfiguration.registerFieldView('template', TemplateFieldView);
 FieldViewConfiguration.registerFieldView('text', TextFieldView);
 FieldViewConfiguration.registerFieldView('wysiwyg', WysiwygFieldView);
 
+@observer
 class AdminBootstrap extends React.Component {
     getChildContext() {
         return {
             configuration: this.props.configuration,
-            restful: this.props.restful
+            state: this.props.state
         };
     }
 
@@ -62,7 +64,7 @@ class AdminBootstrap extends React.Component {
 
 AdminBootstrap.childContextTypes = {
     configuration: React.PropTypes.object.isRequired,
-    restful: React.PropTypes.func.isRequired
+    state: React.PropTypes.object.isRequired
 };
 
 AdminBootstrap.propTypes = {

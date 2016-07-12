@@ -3,8 +3,7 @@ import Datagrid from '../Datagrid/Datagrid';
 
 class ReferencedList extends React.Component {
     render() {
-        const {entries, field, entityName} = this.props;
-        const {sortField, sortDir} = this.props.location.query || {};
+        const {entries, field, entityName, sortDir, sortField} = this.props;
 
         return (
             <Datagrid
@@ -16,7 +15,6 @@ class ReferencedList extends React.Component {
                 entries={entries}
                 sortDir={sortDir}
                 sortField={sortField}
-                configuration={this.context.configuration}
                 />
         );
     }

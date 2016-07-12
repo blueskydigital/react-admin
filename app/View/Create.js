@@ -1,8 +1,5 @@
 import React from 'react';
-import { shouldComponentUpdate } from 'react/lib/ReactComponentWithPureRenderMixin';
-import Inflector from 'inflected';
-import debounce from 'lodash/function/debounce';
-import { List } from 'immutable';
+import { observer } from 'mobx-react';
 
 import { hasEntityAndView, getView, onLoadFailure, onSendFailure } from '../Mixins/MainView';
 
@@ -11,37 +8,23 @@ import Notification from '../Services/Notification';
 import NotFoundView from './NotFound';
 
 import ViewActions from '../Component/ViewActions';
-import EntityActions from '../Actions/EntityActions';
 import EntityStore from '../Stores/EntityStore';
 import Field from '../Component/Field/Field';
 
+@observer
 class CreateView extends React.Component {
     constructor(props, context) {
         super(props, context);
 
-        this.state = {}; // needed for ReactComponentWithPureRenderMixin::shouldComponentUpdate()
-
-        this.shouldComponentUpdate = shouldComponentUpdate.bind(this);
         this.hasEntityAndView = hasEntityAndView.bind(this);
         this.getView = getView.bind(this);
-        this.onLoadFailure = onLoadFailure.bind(this);
-        this.onSendFailure = onSendFailure.bind(this);
-        this.updateField = debounce(this.updateField.bind(this), 300);
 
         this.viewName = 'CreateView';
+        this.actions = [];
         this.isValidEntityAndView = this.hasEntityAndView(this.props.routeParams.entity);
     }
 
     componentDidMount() {
-        this.boundedOnChange = this.onChange.bind(this);
-        EntityStore.addChangeListener(this.boundedOnChange);
-
-        this.boundedOnCreate = this.onCreate.bind(this);
-        EntityStore.addCreateListener(this.boundedOnCreate);
-
-        EntityStore.addReadFailureListener(this.onLoadFailure);
-        EntityStore.addWriteFailureListener(this.onSendFailure);
-
         if (this.isValidEntityAndView) {
             this.init();
         }
@@ -49,46 +32,35 @@ class CreateView extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.params.entity !== this.props.params.entity) {
+
             this.isValidEntityAndView = this.hasEntityAndView(nextProps.params.entity);
             if (this.isValidEntityAndView) {
-                this.init();
+                this.init(nextProps.params.entity);
             }
         }
     }
 
-    componentWillUnmount() {
-        EntityStore.removeCreateListener(this.boundedOnCreate);
-        EntityStore.removeChangeListener(this.boundedOnChange);
-        EntityStore.removeReadFailureListener(this.onLoadFailure);
-        EntityStore.removeWriteFailureListener(this.onSendFailure);
-    }
-
     init() {
-        this.actions = List(this.getView().actions() || ['list']);
+        this.view = this.getView();
+        this.actions = this.view.actions() || ['list'];
         this.refreshData();
     }
 
-    onChange() {
-        this.setState(EntityStore.getState());
-    }
-
     refreshData() {
-        EntityActions.loadCreateData(this.context.restful, this.context.configuration, this.getView());
+        this.props.state.loadCreateData(this.view);
     }
 
     updateField(name, value) {
-        EntityActions.updateData(name, value);
+        this.props.state.updateData(name, value);
     }
 
     save(e) {
         e.preventDefault();
-
-        EntityActions.saveData(this.context.restful, this.context.configuration, this.getView());
+        this.props.state.saveData(this.view).then(this.onCreated.bind(this));
     }
 
-    onCreate() {
+    onCreated(dataStore) {
         const entityName = this.props.routeParams.entity;
-        const dataStore = this.state.data.get('dataStore').first();
         const entry = dataStore.getFirstEntry(this.getView(entityName).entity.uniqueId);
 
         Notification.log('Element successfully created.', {addnCls: 'humane-flatty-success'});
@@ -99,16 +71,17 @@ class CreateView extends React.Component {
 
     buildFields(view, entry, dataStore) {
         let fields = [];
-        const values = this.state.data.get('values');
+        const values = this.props.state.values;
 
         for (let field of view.getFields()) {
-            const value = this.state.data.getIn(['values', field.name()]);
+            const value = values[field.name()];
 
             fields.push(
                 <div className="form-field form-group" key={field.order()}>
                     <Field field={field} value={value} entity={view.entity}
                            values={values} entry={entry}
-                           dataStore={dataStore} updateField={this.updateField} />
+                           dataStore={dataStore}
+                           updateField={this.updateField.bind(this)} />
                 </div>
             );
         }
@@ -117,21 +90,18 @@ class CreateView extends React.Component {
     }
 
     render() {
-        if (!this.isValidEntityAndView) {
+        if (!this.isValidEntityAndView || this.props.state.resourceNotFound) {
             return <NotFoundView/>;
         }
 
-        if (!this.state.hasOwnProperty('data')) {
+        const dataStore = this.props.state.dataStore;
+
+        if(!dataStore) {
             return null;
-        }
-
-        if (this.state.data.get('resourceNotFound')) {
-            return <NotFoundView/>;
         }
 
         const entityName = this.props.routeParams.entity;
         const view = this.getView(entityName);
-        const dataStore = this.state.data.get('dataStore').first();
         const entry = dataStore.getFirstEntry(view.entity.uniqueId);
 
         if (!entry) {
@@ -140,10 +110,10 @@ class CreateView extends React.Component {
 
         return (
             <div className="view create-view">
-                <ViewActions entityName={view.entity.name()} entry={entry} buttons={this.actions} />
+                <ViewActions entityName={entityName} entry={entry} buttons={this.actions} />
 
                 <div className="page-header">
-                    <h1><Compile entry={entry}>{view.title() || 'Create new ' + Inflector.singularize(entityName)}</Compile></h1>
+                    <h1><Compile entry={entry}>{view.title() || 'Create new ' + entityName}</Compile></h1>
                     <p className="description"><Compile>{view.description()}</Compile></p>
                 </div>
 
@@ -154,7 +124,9 @@ class CreateView extends React.Component {
 
                         <div className="form-group">
                             <div className="col-sm-offset-2 col-sm-10">
-                                <button type="submit" className="btn btn-primary"><span className="glyphicon glyphicon-ok"></span> Save Changes</button>
+                                <button type="submit" className="btn btn-primary">
+                                  <span className="glyphicon glyphicon-ok"></span> Save Changes
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -165,7 +137,6 @@ class CreateView extends React.Component {
 }
 
 CreateView.contextTypes = {
-    restful: React.PropTypes.func.isRequired,
     configuration: React.PropTypes.object.isRequired
 };
 

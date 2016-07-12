@@ -1,42 +1,25 @@
 import React from 'react';
-import { shouldComponentUpdate } from 'react/lib/ReactComponentWithPureRenderMixin';
+import { observer } from 'mobx-react';
 
 import DashboardPanel from '../Component/DashboardPanel';
 
-import EntityActions from '../Actions/EntityActions';
-import EntityStore from '../Stores/EntityStore';
-
+@observer
 class DashboardView extends React.Component {
-    constructor() {
-        super();
 
-        this.state = {}; // needed for ReactComponentWithPureRenderMixin::shouldComponentUpdate()
+    // componentDidMount() {
+    //     this.boundedOnChange = this.onChange.bind(this);
+    //     EntityStore.addChangeListener(this.boundedOnChange);
+    //
+    //     this.refreshData();
+    // }
 
-        this.shouldComponentUpdate = shouldComponentUpdate.bind(this);
-    }
-
-    componentDidMount() {
-        this.boundedOnChange = this.onChange.bind(this);
-        EntityStore.addChangeListener(this.boundedOnChange);
-
-        this.refreshData();
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.query.sortField !== this.props.query.sortField ||
-            nextProps.query.sortDir !== this.props.query.sortDir) {
-
-            this.refreshData();
-        }
-    }
-
-    componentWillUnmount() {
-        EntityStore.removeChangeListener(this.boundedOnChange);
-    }
-
-    onChange() {
-        this.setState(EntityStore.getState());
-    }
+    // componentWillReceiveProps(nextProps) {
+    //     if (nextProps.query.sortField !== this.props.query.sortField ||
+    //         nextProps.query.sortDir !== this.props.query.sortDir) {
+    //
+    //         this.refreshData();
+    //     }
+    // }
 
     refreshData() {
         const {sortField, sortDir} = this.props.location.query || {};
@@ -73,13 +56,15 @@ class DashboardView extends React.Component {
     }
 
     render() {
-        if (!this.state.hasOwnProperty('data')) {
+        const dataStore = this.props.state.dataStore;
+
+        if (!dataStore) {
             return null;
         }
 
-        const panels = this.state.data.get('panels') || [];
+        const panels = this.props.state.panels || [];
 
-        if (!panels.count()) {
+        if (!panels.length) {
             return null;
         }
 
@@ -106,9 +91,9 @@ class DashboardView extends React.Component {
     }
 }
 
-DashboardView.contextTypes = {
-    restful: React.PropTypes.func.isRequired,
-    configuration: React.PropTypes.object.isRequired
-};
+// DashboardView.contextTypes = {
+//     restful: React.PropTypes.func.isRequired,
+//     configuration: React.PropTypes.object.isRequired
+// };
 
 export default DashboardView;
