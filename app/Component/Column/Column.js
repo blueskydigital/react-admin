@@ -1,15 +1,13 @@
 import React from 'react';
 import { browserHistory } from 'react-router';
 
-import Compile from '../Compile';
 import FieldViewConfiguration from '../../Field/FieldViewConfiguration';
 
 class Column extends React.Component {
     getDetailAction (entry) {
         return function() {
             const entityName = this.props.entity.name();
-            const entity = this.context.configuration.getEntity(entityName);
-            const route = entity.editionView().enabled ? 'edit' : 'show';
+            const route = this.props.entity.editionView().enabled ? 'edit' : 'show';
 
             const to = `/${entityName}/${route}/${entry.identifierValue}`;
             browserHistory.push(to);
@@ -26,7 +24,7 @@ class Column extends React.Component {
         }
 
         const referenceEntity = field.targetEntity().name();
-        const relatedEntity = this.context.configuration.getEntity(referenceEntity);
+        const relatedEntity = this.props.configuration.getEntity(referenceEntity);
 
         if (!relatedEntity) { return false; }
 
@@ -37,22 +35,18 @@ class Column extends React.Component {
         const {field, entry, entity} = this.props;
         const isDetailLink = this.isDetailLink(field);
         const detailAction = isDetailLink ? this.getDetailAction(this.props.entry) : null;
-        const type = field.type();
-        const value = entry.values[field.name()] || null;
-        const fieldView = FieldViewConfiguration.getFieldView(type);
+        const fieldView = FieldViewConfiguration.getFieldView(field.type());
+        const props = Object.assign({
+          value: this.props.entry.values[field.name()] || null,
+          detailAction,
+        }, this.props);
 
-        let column = null;
+        let renderFunc = null;
 
         if (fieldView) {
-            column = isDetailLink ? fieldView.getLinkWidget : fieldView.getReadWidget;
+            renderFunc = isDetailLink ? fieldView.getLinkWidget : fieldView.getReadWidget;
+            return renderFunc.bind({props: props})();
         }
-
-        return (
-            <Compile detailAction={detailAction} field={field} configuration={this.context.configuration}
-                dataStore={this.props.dataStore} entity={entity} entry={entry} value={value}>
-                {column}
-            </Compile>
-        );
     }
 }
 
@@ -60,11 +54,8 @@ Column.propTypes = {
     field: React.PropTypes.object.isRequired,
     entry: React.PropTypes.object.isRequired,
     entity: React.PropTypes.object.isRequired,
+    configuration: React.PropTypes.object.isRequired,
     dataStore: React.PropTypes.object
-};
-
-Column.contextTypes = {
-    configuration: React.PropTypes.object.isRequired
 };
 
 export default Column;

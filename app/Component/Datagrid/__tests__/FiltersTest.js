@@ -1,7 +1,6 @@
 jest.disableAutomock();
 
 import React from 'react';
-import Immutable from 'immutable';
 
 import Field from 'admin-config/lib/Field/Field';
 import FieldViewConfiguration from '../../../Field/FieldViewConfiguration';
@@ -44,7 +43,7 @@ describe('Filters', () => {
 
     describe('Display', () => {
         it('should display pinned and selected filters', () => {
-            const selectedFilters = Immutable.List([pinnedFilter, notPinned]);
+            const selectedFilters = [pinnedFilter, notPinned];
             let filters = getFilters(selectedFilters);
 
             const pinnedField = filters.find('.filter-author input');
@@ -66,7 +65,7 @@ describe('Filters', () => {
 
     describe('Callback', () => {
         it('should call hideFilter callback on filter remove', () => {
-            const selectedFilters = Immutable.List([pinnedFilter, notPinned]);
+            const selectedFilters = [pinnedFilter, notPinned];
             let filters = getFilters(selectedFilters);
             const notPinnedRemove = filters.find('.filter-name a.remove');
             notPinnedRemove.simulate('click');
@@ -75,7 +74,7 @@ describe('Filters', () => {
         });
 
         it('should call updateField callback on filter value changed', () => {
-            const selectedFilters = Immutable.List([pinnedFilter, notPinned]);
+            const selectedFilters = [pinnedFilter, notPinned];
             let filters = getFilters(selectedFilters);
             const notPinnedField = filters.find('.filter-name input');
             notPinnedField.simulate('change', { target: { value: 'Me'} });

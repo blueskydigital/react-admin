@@ -1,19 +1,11 @@
 import React from 'react';
-import { shouldComponentUpdate } from 'react/lib/ReactComponentWithPureRenderMixin';
 
-import Compile from '../../Component/Compile';
 import FieldViewConfiguration from '../../Field/FieldViewConfiguration';
 
 class Filters extends React.Component {
-    constructor(props, context) {
-        super(props, context);
-
-        this.shouldComponentUpdate = shouldComponentUpdate.bind(this);
-    }
 
     buildRows(filters) {
         const { entity, dataStore, updateField, hideFilter } = this.props;
-        const configuration = this.context.configuration;
         const { search } = this.props.location.query || {};
 
         return filters.map((filter, i) => {
@@ -22,8 +14,10 @@ class Filters extends React.Component {
             const autoFocus = !filter.pinned();
             const fieldName = filter.name();
             const fieldView = FieldViewConfiguration.getFieldView(filter.type());
+            if(! fieldView) {
+              return null;
+            }
             const className = `filter-value react-admin-field-${filter.name()} col-sm-8 col-md-8`;
-            const fieldTemplate = fieldView ? fieldView.getFilterWidget : null;
             const values = null;
             let deleteLink = null;
 
@@ -35,6 +29,14 @@ class Filters extends React.Component {
                 );
             }
 
+            const props = Object.assign({
+              value,
+              fieldName,
+              className
+            }, this.props);
+
+            const widget = fieldView ? fieldView.getWriteWidget.bind({props: props})() : null;
+
             return (
                 <div className={`form-field form-group filter-${fieldName}`} key={i}>
                     <span className="col-sm-1 col-xs-1">{deleteLink}</span>
@@ -43,11 +45,7 @@ class Filters extends React.Component {
                         <label htmlFor={fieldName} className={"control-label col-sm-3 col-md-3"}>{ filter.label() }</label>
 
                         <div className={className}>
-                            <Compile field={filter} updateField={updateField} dataStore={dataStore}
-                                entity={entity} value={value} values={values} fieldName={fieldName} entry={null}
-                                configuration={configuration} autoFocus={autoFocus}>
-                            {fieldTemplate}
-                            </Compile>
+                            {widget}
                         </div>
                     </div>
                 </div>
@@ -67,16 +65,11 @@ class Filters extends React.Component {
 }
 
 Filters.propTypes = {
-    filters: React.PropTypes.object.isRequired,
+    filters: React.PropTypes.array.isRequired,
     updateField: React.PropTypes.func.isRequired,
     hideFilter: React.PropTypes.func.isRequired,
     entity: React.PropTypes.object,
     dataStore: React.PropTypes.object
-};
-
-Filters.contextTypes = {
-    restful: React.PropTypes.func.isRequired,
-    configuration: React.PropTypes.object.isRequired
 };
 
 export default Filters;

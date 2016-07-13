@@ -59,7 +59,7 @@ class EditView extends React.Component {
     }
 
     render() {
-        if (this.props.state.loading) {
+        if (this.props.state.loading || !this.props.state.view || this.props.state.view.type != 'EditView') {
           return null;
         }
 

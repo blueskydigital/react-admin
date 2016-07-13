@@ -1,7 +1,6 @@
 jest.disableAutomock();
 import React from 'react';
 import { shallow, mount, render } from 'enzyme';
-import { List } from 'immutable'
 import Field from 'admin-config/lib/Field/Field';
 import FieldViewConfiguration from '../../../Field/FieldViewConfiguration';
 import StringFieldView from '../../../Field/StringFieldView';
@@ -22,7 +21,7 @@ describe('FieldButton', () => {
     describe('With good props', () => {
         it('Should display label and default size', () => {
             const wrapper = mount(
-              <FilterButton filters={List([filter])} showFilter={showFilter} />
+              <FilterButton filters={[filter]} showFilter={showFilter} />
             );
             const title = wrapper.find('DropdownButton span').first();
             expect(title.html()).toContain('Add filters');
@@ -34,7 +33,7 @@ describe('FieldButton', () => {
 
         it('Should call showFilter callback', () => {
             const wrapper = mount(
-              <FilterButton filters={List([filter])} showFilter={showFilter} />
+              <FilterButton filters={[filter]} showFilter={showFilter} />
             );
             wrapper.find('.dropdown-menu a').simulate('click');
 

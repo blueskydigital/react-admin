@@ -6,7 +6,6 @@ import TestUtils from 'react-addons-test-utils';
 // import sd from 'skin-deep';
 import SelectField from '../SelectField';
 import AdminChoiceField from 'admin-config/lib/Field/ChoiceField';
-import Immutable from 'immutable';
 
 import ChoiceField from '../ChoiceField';
 
@@ -16,7 +15,7 @@ describe('ChoiceField', () => {
 
     beforeEach(() => {
         SelectField.mockClear();
-        values = Immutable.Map({});
+        values = {};
     });
 
     it('should get a choice with correct props', () => {
@@ -51,7 +50,7 @@ describe('ChoiceField', () => {
 
             return choices[entry.values.otherFieldVal];
         });
-        values = values.set('otherFieldVal', 'something');
+        values = {'otherFieldVal': 'something'};
         const instance = TestUtils.renderIntoDocument(
           <ChoiceField fieldName="my_field" field={myChoiceField} values={values}/>
         );
