@@ -56,7 +56,7 @@ class ShowView extends React.Component {
                             <label className="col-sm-2 control-label">{ field.label() }</label>
 
                             <div className={'show-value react-admin-field-' + field.name() + ' ' + (field.getCssClasses(entry) || 'col-sm-10 col-md-8 col-lg-7')}>
-                                <Column field={field} entity={view.getEntity()} entry={entry} dataStore={dataStore} />
+                                <Column field={field} entity={view.getEntity()} entry={entry} dataStore={dataStore} configuration={this.props.configuration} />
                             </div>
                         </div>
                     ))}

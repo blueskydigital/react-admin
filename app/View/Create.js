@@ -2,7 +2,6 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { browserHistory } from 'react-router';
 
-import Compile from '../Component/Compile';
 import Notification from '../Services/Notification';
 import NotFoundView from './NotFound';
 
@@ -88,8 +87,8 @@ class CreateView extends React.Component {
                 />
 
                 <div className="page-header">
-                    <h1><Compile entry={entry}>{view.title() || 'Create new ' + entityName}</Compile></h1>
-                    <p className="description"><Compile>{view.description()}</Compile></p>
+                    <h1>{view.title() || 'Create new ' + entityName}</h1>
+                    <p className="description">{view.description()}</p>
                 </div>
 
                 <div className="row form-horizontal" id="create-view">

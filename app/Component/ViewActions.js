@@ -1,5 +1,4 @@
 import React from 'react';
-import Compile from './Compile';
 
 import { FilterButton, MaBackButton, MaCreateButton, MaShowButton, MaEditButton, MaDeleteButton, MaListButton } from './Button';
 
@@ -9,11 +8,6 @@ class ViewActions extends React.Component {
         const { size, entityName, buttons, entry, view, filters, showFilter } = this.props;
         let results;
         let i = 0;
-
-        // Direct template
-        if ('string' === typeof listActions) {
-            return <Compile entityName={entityName} entry={entry}>listActions</Compile>;
-        }
 
         results = buttons.map(button => {
             switch (button) {
@@ -43,7 +37,7 @@ class ViewActions extends React.Component {
 
                     return <MaDeleteButton key={i++} entityName={entityName} entry={entry} size={size} />;
                 default:
-                    return <Compile entityName={entityName} entry={entry}>button</Compile>;
+                    return button;
             }
         });
 

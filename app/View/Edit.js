@@ -1,7 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 
-import Compile from '../Component/Compile';
 import Notification from '../Services/Notification';
 import NotFoundView from './NotFound';
 
@@ -9,7 +8,7 @@ import ViewActions from '../Component/ViewActions';
 import EntityStore from '../Stores/EntityStore';
 import Field from '../Component/Field/Field';
 
-
+@observer
 class EditView extends React.Component {
 
     componentDidMount() {
@@ -59,7 +58,7 @@ class EditView extends React.Component {
     }
 
     render() {
-        if (this.props.state.loading) {
+        if (this.props.state.loading || !this.props.state.view || this.props.state.view.type != 'EditView') {
           return null;
         }
 
@@ -86,8 +85,8 @@ class EditView extends React.Component {
                 <ViewActions entityName={entityName} entry={entry} buttons={this.props.state.viewActions} />
 
                 <div className="page-header">
-                    <h1><Compile entry={entry}>{view.title() || 'Edit one ' + entityName}</Compile></h1>
-                    <p className="description"><Compile>{view.description()}</Compile></p>
+                    <h1>{view.title() || 'Edit one ' + entityName}</h1>
+                    <p className="description">{view.description()}</p>
                 </div>
 
                 <div className="row form-horizontal" id="edit-view">

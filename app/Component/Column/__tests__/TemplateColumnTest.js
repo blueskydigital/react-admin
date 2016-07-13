@@ -14,16 +14,9 @@ describe('TemplateColumn', () => {
           <TemplateColumn template={template} entry={entry} />
         );
 
-        expect(wrapper.find('span').text()).toBe('John DOE');
-    });
-
-    it('should transform template string through React compiler, giving access to `entry` value', () => {
-        const template = '{entry.first_name} {entry.last_name.toUpperCase()}';
-        const entry = { 'last_name': 'Doe', 'first_name': 'John' };
-        const wrapper = mount(
-          <TemplateColumn template={template} entry={entry} />
-        );
+        // console.log(wrapper.debug());
 
         expect(wrapper.find('span').text()).toBe('John DOE');
     });
+
 });

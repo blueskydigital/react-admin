@@ -1,5 +1,4 @@
 import React from 'react';
-import Compile from '../Compile';
 import MaShowButton from '../Button/MaShowButton';
 import MaEditButton from '../Button/MaEditButton';
 import MaDeleteButton from '../Button/MaDeleteButton';
@@ -10,11 +9,6 @@ class DatagridActions extends React.Component {
         let buttons;
         let i = 0;
 
-        // Direct template
-        if ('string' === typeof listActions) {
-            return <Compile entityName={entityName} entry={entry}>{listActions}</Compile>;
-        }
-
         buttons = listActions.map(button => {
             switch (button) {
                 case 'show':
@@ -24,7 +18,7 @@ class DatagridActions extends React.Component {
                 case 'delete':
                     return <MaDeleteButton key={i++} entityName={entityName} entry={entry} size={size} />;
                 default:
-                    return <Compile key={i++} entityName={entityName} entry={entry}>{button}</Compile>;
+                    return <div key={i++}>{button}</div>;
             }
         });
 

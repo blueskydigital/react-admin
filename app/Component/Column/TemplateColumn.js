@@ -1,5 +1,4 @@
 import React from 'react';
-import Compile from '../Compile';
 
 class TemplateColumn extends React.Component {
     render() {
@@ -11,16 +10,13 @@ class TemplateColumn extends React.Component {
         }
 
         return (
-            <Compile entry={this.props.entry}>{computedTemplate}</Compile>
+            <span>{computedTemplate}</span>
         );
     }
 }
 
 TemplateColumn.propTypes = {
-    template: React.PropTypes.oneOfType([
-        React.PropTypes.string,
-        React.PropTypes.func
-    ]).isRequired,
+    template: React.PropTypes.func.isRequired,
     entry: React.PropTypes.object
 };
 

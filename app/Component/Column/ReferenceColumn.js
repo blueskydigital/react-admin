@@ -8,17 +8,12 @@ class ReferenceColumn extends React.Component {
         const isDetail = referenceEntity.isReadOnly ? referenceEntity.showView().enabled : referenceEntity.editionView().enabled;
 
         if (isDetail) {
-            const to = referenceEntity.isReadOnly ? 'show' : field.detailLinkRoute(),
-                referenceId = entry.values[field.name()],
-                params = {
-                    entity: referenceEntity.name(),
-                    id: referenceId
-                };
+            const route = referenceEntity.isReadOnly ? 'show' : field.detailLinkRoute();
+            const referenceId = entry.values[field.name()];
+            const to = `${route}/${referenceEntity.name()}/${referenceId}`;
 
             return (
-                <Link className="reference-column" to={to} params={params}>
-                    {value}
-                </Link>
+                <Link className="reference-column" to={to}>{value}</Link>
             );
         }
 

@@ -24,6 +24,8 @@ describe('Column', () => {
         return wrapper;
     }
 
+    let dataStore = {};
+    let configuration = {};
 
     it('should display a string field', () => {
         const field = new Field('name');
@@ -33,7 +35,7 @@ describe('Column', () => {
                 'name': 'my posts #1'
             }
         };
-        const col = getColumn(field, entity, entry);
+        const col = getColumn(field, entity, entry, dataStore, configuration);
 
         expect(col.text()).toEqual('my posts #1');
     });
@@ -47,7 +49,7 @@ describe('Column', () => {
             }
         };
         field.isDetailLink(true);
-        const col = getColumn(field, entity, entry);
+        const col = getColumn(field, entity, entry, dataStore, configuration);
 
         expect(col.find('a span').text()).toEqual('123');
     });

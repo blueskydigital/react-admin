@@ -1,6 +1,5 @@
 import React from 'react';
 import {Link} from 'react-router';
-import Compile from '../../Component/Compile';
 
 class Header extends React.Component {
     render() {
@@ -8,7 +7,7 @@ class Header extends React.Component {
             <header className="header">
                 <h1>
                     <Link to="/">
-                        <Compile>{this.props.title}</Compile>
+                        {this.props.title}
                     </Link>
                 </h1>
             </header>

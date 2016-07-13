@@ -2,7 +2,6 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { browserHistory } from 'react-router';
 
-import Compile from '../Component/Compile';
 import NotFoundView from './NotFound';
 
 import ViewActions from '../Component/ViewActions';
@@ -67,8 +66,8 @@ class DeleteView extends React.Component {
                         <ViewActions entityName={entityName} buttons={this.props.state.viewActions} />
 
                         <div className="page-header">
-                            <h1><Compile entry={entry}>{view.title() || 'Delete one ' + entityName}</Compile></h1>
-                            <p className="description"><Compile entry={entry}>{view.description()}</Compile></p>
+                            <h1>{view.title() || 'Delete one ' + entityName}</h1>
+                            <p className="description">{view.description()}</p>
                         </div>
                     </div>
                 </div>
