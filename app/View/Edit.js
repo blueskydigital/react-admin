@@ -9,7 +9,7 @@ import ViewActions from '../Component/ViewActions';
 import EntityStore from '../Stores/EntityStore';
 import Field from '../Component/Field/Field';
 
-
+@observer
 class EditView extends React.Component {
 
     componentDidMount() {

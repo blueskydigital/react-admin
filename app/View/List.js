@@ -150,7 +150,7 @@ class ListView extends React.Component {
         const sortDir = this.props.state.sortDir;
         const sortField = this.props.state.sortField;
 
-        if(! view.listActions) {  // hack: not yet loaded. Solve with more optimal components
+        if(!view || ! view.listActions) {  // hack: not yet loaded. Solve with more optimal components
           return null;
         }
 
