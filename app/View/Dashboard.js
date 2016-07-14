@@ -6,39 +6,31 @@ import DashboardPanel from '../Component/DashboardPanel';
 @observer
 class DashboardView extends React.Component {
 
-    // componentDidMount() {
-    //     this.boundedOnChange = this.onChange.bind(this);
-    //     EntityStore.addChangeListener(this.boundedOnChange);
-    //
-    //     this.refreshData();
-    // }
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.query && (
+              nextProps.query.sortField !== this.props.query.sortField ||
+              nextProps.query.sortDir !== this.props.query.sortDir)) {
 
-    // componentWillReceiveProps(nextProps) {
-    //     if (nextProps.query.sortField !== this.props.query.sortField ||
-    //         nextProps.query.sortDir !== this.props.query.sortDir) {
-    //
-    //         this.refreshData();
-    //     }
-    // }
+            this.props.state.loadDashboardPanels(nextProps.query.sortField, nextProps.query.sortDir);
+        }
+    }
 
-    refreshData() {
-        const {sortField, sortDir} = this.props.location.query || {};
-
-        EntityActions.loadDashboardPanels(this.props.restful, this.props.configuration, sortField, sortDir);
+    componentDidMount() {
+        this.props.state.loadDashboardPanels();
     }
 
     buildPanels(panels, odd=true) {
-        const sortDir = this.state.data.get('sortDir');
-        const sortField = this.state.data.get('sortField');
-        const dataStore = this.state.data.getIn(['dataStore', 'object']);
+        const sortDir = this.props.state.sortDir;
+        const sortField = this.props.state.sortField;
+        const dataStore = this.props.state.dataStore;
         const panelViews = [];
         let label, view;
 
         panels
             .filter((v, k) => (odd && (0 !== k % 2)) || (!odd && (0 === k % 2)))
             .forEach((panel, key) => {
-                label = panel.get('label');
-                view = panel.get('view');
+                label = panel.label;
+                view = panel.view;
 
                 panelViews.push((
                     <div key={key} className="panel panel-default">
@@ -90,10 +82,5 @@ class DashboardView extends React.Component {
         );
     }
 }
-
-// DashboardView.contextTypes = {
-//     restful: React.PropTypes.func.isRequired,
-//     configuration: React.PropTypes.object.isRequired
-// };
 
 export default DashboardView;

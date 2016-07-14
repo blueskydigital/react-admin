@@ -1,5 +1,6 @@
 import {observable, computed, autorun, action, transaction} from 'mobx';
 import DataStore from 'admin-config/lib/DataStore/DataStore';
+import PromisesResolver from 'admin-config/lib/Utils/PromisesResolver';
 
 import BaseStore from './Base';
 
@@ -33,10 +34,61 @@ export default class EntityStore extends BaseStore {
     return {}
   }
 
-  // @action
-  // loadDashboardPanels(restful, configuration, sortField, sortDir) {
-  //
-  // }
+  @action
+  loadDashboardPanels(sortField, sortDir) {
+    const dashboardViews = this.config.getViewsOfType('DashboardView');
+    let panels = [];
+    let dataStore = new DataStore();
+    let promises = [];
+
+    this.loading = true;
+
+    let i,
+        view,
+        entity,
+        dashboardSortField,
+        dashboardSortDir;
+
+    for (i in dashboardViews) {
+        view = dashboardViews[i];
+        entity = view.entity;
+        dashboardSortField = null;
+        dashboardSortDir = null;
+
+        if (sortField && sortField.split('.')[0] === view.name()) {
+            dashboardSortField = sortField;
+            dashboardSortDir = sortDir;
+        }
+
+        panels.push({
+            label: view.title() || entity.label(),
+            view: view,
+            entity: entity,
+            sortDir: view.sortDir(),
+            sortField: view.sortField()
+        });
+
+        promises.push(this.requester.getEntries(dataStore, view, 1, {
+            references: true,
+            sortField: dashboardSortField,
+            sortDir: dashboardSortDir
+        }));
+    }
+
+    PromisesResolver.allEvenFailed(promises).then((responses) => {
+      if (0 === responses.length) {
+          return;
+      }
+
+      transaction(() => {
+        this.panels = panels;
+        this.dataStore = dataStore;
+        this.loading = false;
+        this.sortField = sortField;
+        this.sortDir = sortDir;
+      });
+    }).catch(this.throwPromiseError);
+  }
 
   @action
   updatePage(page) {
@@ -124,7 +176,7 @@ export default class EntityStore extends BaseStore {
     this.loading = true;
 
     return this.requester.getEntry(view, id, {
-      references: true, referencesList: true, sortField, sortDir
+      references: true, referencesList: true, choices: true, sortField, sortDir
     }).then((dataStore) => {
       transaction(() => {
         this.originEntityId = id;
@@ -229,7 +281,7 @@ export default class EntityStore extends BaseStore {
   deleteData() {
     this.loading = true;
     const id = this.originEntityId;
-    
+
     return this.requester.deleteEntry(this.view, id).then(() => {
       this.loading = false;
     });
