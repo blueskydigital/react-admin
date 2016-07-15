@@ -8,7 +8,10 @@ import BaseStore from './Base';
 export default class EntityStore extends BaseStore {
 
   _actions = {
-    'show': ['list', 'edit', 'delete']
+    'ListView': ['filters', 'create'],
+    'EditView': ['list', 'delete'],
+    'ShowView': ['list', 'edit', 'delete'],
+    'DeleteView': ['back']
   }
 
   @observable panels = [];
@@ -20,18 +23,47 @@ export default class EntityStore extends BaseStore {
   @observable page = 1;
   @observable sortDir = null;
   @observable sortField = null;
-  @observable filters = null;
-  @observable selected = [];
+  @observable visibleFilters = [];
+  @observable filterValues = {};
   @observable resourceNotFound = false;
   @observable loading = false;
   @observable view = null;
 
   @computed get viewActions() {
-    return this.view.actions() || ['create', 'list'];
+    return this.view.actions() || this._actions[this.view.type];
   }
 
   @computed get unselectedFilters() {
-    return {}
+    return this.view ? this.view.filters() : [];
+  }
+
+  @action
+  showFilter(filter) {
+    this.visibleFilters.push(filter);
+  }
+
+  @action
+  updateFilters(newFilters) {
+    transaction(() => {
+      // check if visible need to hide
+      this.visibleFilters.filter((f) => ! (f.name() in newFilters))
+        .forEach((i) => this.visibleFilters.remove(i));
+      this.loading = true;
+    });
+    // update data    
+    return this.requester.getEntries(new DataStore(), this.view, this.page, {
+      references: true,
+      choices: true,
+      sortField: this.sortField,
+      sortDir: this.sortDir,
+      filters: newFilters
+    }).then((collection) => {
+      transaction(() => {
+        this.filters = newFilters;
+        this.dataStore = collection.dataStore;
+        this.loading = false;
+      });
+    });
   }
 
   @action
@@ -129,10 +161,10 @@ export default class EntityStore extends BaseStore {
 
   @action
   loadListData(entityName, page = 1, sortField = null, sortDir = null, filters = null) {
-    let view = this.getView(entityName, 'ListView');
+    this.view = this.getView(entityName, 'ListView');
     this.loading = true;
 
-    return this.requester.getEntries(new DataStore(), view, page, {
+    return this.requester.getEntries(new DataStore(), this.view, page, {
       references: true,
       choices: true,
       sortField,
@@ -141,7 +173,6 @@ export default class EntityStore extends BaseStore {
     }).then((collection) => {
       transaction(() => {
         this.entityName = entityName;
-        this.view = view;
         this.page = page;
         this.sortField = sortField;
         this.sortDir = sortDir;

@@ -53,7 +53,7 @@ ViewActions.propTypes = {
     buttons: React.PropTypes.array.isRequired,
     size: React.PropTypes.string,
     view: React.PropTypes.object,
-    filters: React.PropTypes.object,
+    filters: React.PropTypes.array,
     showFilter: React.PropTypes.func
 };
 

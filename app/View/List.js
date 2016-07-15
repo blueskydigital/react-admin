@@ -14,6 +14,10 @@ class ListView extends React.Component {
 
     componentDidMount() {
         this.props.state.loadListData(this.props.routeParams.entity);
+        const viewFilters = this.props.state.view.filters();
+        if(viewFilters.length > 0) {
+            this.initFilters(viewFilters);
+        }
     }
 
     componentWillReceiveProps(nextProps) {
@@ -24,49 +28,34 @@ class ListView extends React.Component {
         } else if(nextProps.location.query.sortField !== this.props.location.query.sortField ||
             nextProps.location.query.sortDir !== this.props.location.query.sortDir) {
             this.props.state.updateSort(nextProps.location.query.sortField, nextProps.location.query.sortDir);
+        } else if(nextProps.location.query.search !== this.props.location.query.search) {
+            const newFilters = nextProps.location.query.search;
+            this.props.state.updateFilters(newFilters ? JSON.parse(newFilters) : {});
         }
     }
 
-    initFilters() {
-        const viewFilters = this.getView().filters();
+    initFilters(viewFilters) {
         let selected = viewFilters.filter(filter => filter.pinned());
-        let unselected = [];
 
-        const { search } = this.props.location.query || {};
-        for (let filter of viewFilters) {
-            if (filter.pinned()) {
-                continue;
-            }
-
-            if (search && filter.name() in search) {
-                selected.push(filter);
-            } else {
-                unselected.push(filter);
-            }
+        const search = this.props.location.query.search || {};
+        Object.assign(search, selected);
+        if(search.length > 0) {
+          this._changeQuery({search: search});
         }
     }
 
     showFilter(filter) {
-        // ApplicationActions.showFilter(filter);
+        this.props.state.showFilter(filter);
     }
 
     hideFilter(filter) {
-        return () => {
-            // ApplicationActions.hideFilter(filter);
-            this.updateFilterField(filter.name(), null);
-        };
+        // just set the filter query to null -> new props -> state:updateFilters
+        this.updateFilterField(filter.name(), null);
     }
 
     updateFilterField(name, value) {
         let query = this.props.location.query || {};
-
-        if (!query.search) {
-            query.search = {};
-        }
-
-        if (query.page) {
-            delete query.page;
-        }
+        let search = query.search ? JSON.parse(query.search) : {};
 
         if ('string' === typeof value && !value.length) {
             value = null;
@@ -74,19 +63,19 @@ class ListView extends React.Component {
 
         let hasModification = false;
         if (value !== null && value !== undefined) {
-            query.search[name] = value;
+            search[name] = value;
             hasModification = true;
-        } else if (name in query.search) {
-            delete query.search[name];
+        } else if (name in search) {
+            delete search[name];
             hasModification = true;
         }
 
-        if (0 === Object.keys(query.search).length) {
-            delete query.search;
+        if (0 === Object.keys(search).length) {
+            return this._changeQuery({search: null});
         }
 
         if (hasModification) {
-            this.refreshList(query);
+            this._changeQuery({search: search});
         }
     }
 
@@ -96,9 +85,17 @@ class ListView extends React.Component {
 
     _changeQuery(newquery) {
         let query = Object.assign({}, this.props.location.query || {});
-        Object.assign(query, newquery);
+        for(let k in newquery) {
+          if(newquery[k] === null) { // removal
+            delete query[k]
+          } else {
+            query[k] = newquery[k]; // adding
+          }
+        }
         const serialized = Object.keys(query).reduce( (a,k) => {
-            a.push(k + '=' + encodeURIComponent(query[k]));
+            const val = typeof query[k] === 'object' ?
+              JSON.stringify(query[k]) : encodeURIComponent(query[k]);
+            a.push(k + '=' + val);
             return a
         }, []).join('&');
 
@@ -118,16 +115,17 @@ class ListView extends React.Component {
     }
 
     buildFilters() {
-      // if (!filters.get('selected').isEmpty()) {
-      //     filter = (
-      //         <Filters
-      //             filters={filters.get('selected')}
-      //             entity={view.entity}
-      //             dataStore={dataStore}
-      //             hideFilter={this.boundedHideFilter}
-      //             updateField={this.boundedUpdateFilterField} />
-      //         );
-      // }
+        if (this.props.state.visibleFilters.length > 0) {
+            return (
+                <Filters
+                    filters={this.props.state.visibleFilters}
+                    values={this.props.state.filterValues}
+                    entity={this.props.state.view.entity}
+                    dataStore={this.props.state.dataStore}
+                    hideFilter={this.hideFilter.bind(this)}
+                    updateField={this.updateFilterField.bind(this)} />
+            );
+        }
     }
 
     render() {

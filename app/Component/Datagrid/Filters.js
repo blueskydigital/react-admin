@@ -4,13 +4,18 @@ import FieldViewConfiguration from '../../Field/FieldViewConfiguration';
 
 class Filters extends React.Component {
 
+    hideFilter(filter) {
+        return () => {
+            this.props.hideFilter(filter);
+        };
+    }
+
     buildRows(filters) {
-        const { entity, dataStore, updateField, hideFilter } = this.props;
-        const { search } = this.props.location.query || {};
+        const { entity, dataStore, updateField, hideFilter, values } = this.props;
 
         return filters.map((filter, i) => {
             const filterName = filter.name();
-            const value = search && filterName in search ? search[filterName] : null;
+            const value = values && filterName in values ? values[filterName] : null;
             const autoFocus = !filter.pinned();
             const fieldName = filter.name();
             const fieldView = FieldViewConfiguration.getFieldView(filter.type());
@@ -23,7 +28,7 @@ class Filters extends React.Component {
 
             if (!filter.pinned()) {
                 deleteLink = (
-                    <a className="remove" onClick={hideFilter(filter)}>
+                    <a className="remove" onClick={this.hideFilter(filter)}>
                         <span className="glyphicon glyphicon-remove"></span>
                     </a>
                 );
@@ -32,7 +37,8 @@ class Filters extends React.Component {
             const props = Object.assign({
               value,
               fieldName,
-              className
+              className,
+              field: filter
             }, this.props);
 
             const widget = fieldView ? fieldView.getWriteWidget.bind({props: props})() : null;
@@ -66,6 +72,7 @@ class Filters extends React.Component {
 
 Filters.propTypes = {
     filters: React.PropTypes.array.isRequired,
+    values: React.PropTypes.object.isRequired,
     updateField: React.PropTypes.func.isRequired,
     hideFilter: React.PropTypes.func.isRequired,
     entity: React.PropTypes.object,

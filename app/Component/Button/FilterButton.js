@@ -31,7 +31,7 @@ class FilterButton extends React.Component {
 }
 
 FilterButton.propTypes = {
-    filters: React.PropTypes.object,
+    filters: React.PropTypes.array,
     showFilter: React.PropTypes.func
 };
 
