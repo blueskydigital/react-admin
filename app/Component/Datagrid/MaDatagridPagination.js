@@ -1,12 +1,6 @@
 import React from 'react';
-import { shouldComponentUpdate } from 'react/lib/ReactComponentWithPureRenderMixin';
 
 class MaDatagridPagination extends React.Component {
-    constructor(props, context) {
-        super(props, context);
-
-        this.shouldComponentUpdate = shouldComponentUpdate.bind(this);
-    }
 
     onChange(page) {
         return () => { this.props.onChange(page); };

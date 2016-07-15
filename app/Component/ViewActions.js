@@ -5,13 +5,20 @@ import { FilterButton, MaBackButton, MaCreateButton, MaShowButton, MaEditButton,
 class ViewActions extends React.Component {
 
     render() {
-        const { size, entityName, buttons, entry, view, filters, showFilter } = this.props;
+        const { size, entry, showFilter } = this.props;
+        const view = this.props.state.view;
+        const entityName = view.entity.name();
+        const buttons = this.props.state.viewActions || [];
+        const filters = this.props.state.unselectedFilters;
         let results;
         let i = 0;
 
         results = buttons.map(button => {
             switch (button) {
                 case 'filters':
+                    if(! filters.length) {
+                      return null;
+                    }
                     return <FilterButton key={i++} entityName={entityName} filters={filters} showFilter={showFilter} />;
                 case 'create':
                     return <MaCreateButton key={i++} entityName={entityName} size={size} />;
@@ -48,12 +55,7 @@ class ViewActions extends React.Component {
 }
 
 ViewActions.propTypes = {
-    entityName: React.PropTypes.string,
-    entry: React.PropTypes.object,
-    buttons: React.PropTypes.array.isRequired,
     size: React.PropTypes.string,
-    view: React.PropTypes.object,
-    filters: React.PropTypes.array,
     showFilter: React.PropTypes.func
 };
 

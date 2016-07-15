@@ -2,6 +2,8 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { browserHistory } from 'react-router'
 
+import DevTools from 'mobx-react-devtools';
+
 import NotFoundView from './NotFound';
 
 import Datagrid from '../Component/Datagrid/Datagrid';
@@ -10,6 +12,71 @@ import ViewActions from '../Component/ViewActions';
 import Filters from '../Component/Datagrid/Filters';
 
 @observer
+class ObservableListView extends React.Component {
+
+    buildPagination(view) {
+        const totalItems = this.props.state.totalItems;
+        const page = +this.props.state.page;
+
+        return <MaDatagridPagination totalItems={totalItems} page={page}
+          perPage={view.perPage()} onChange={this.props.changePage} />;
+    }
+
+    buildFilters() {
+        if (this.props.state.visibleFilters.length > 0) {
+            return (
+                <Filters
+                    filters={this.props.state.visibleFilters}
+                    values={this.props.state.filterValues}
+                    entity={this.props.state.view.entity}
+                    dataStore={this.props.state.dataStore}
+                    hideFilter={this.props.hideFilter}
+                    updateField={this.props.updateFilterField} />
+            );
+        }
+    }
+
+    render() {
+        const view = this.props.state.view;
+        if(! view || view.type != 'ListView') {
+           return null;
+        }
+
+        return (
+            <div className="view list-view">
+                <DevTools />
+                <ViewActions state={this.props.state} showFilter={this.props.showFilter} />
+
+                <div className="page-header">
+                    <h1>{view.title() || view.entity.name() + ' list'}</h1>
+                    <p className="description">{view.description()}</p>
+                </div>
+
+                {this.buildFilters()}
+
+                <Datagrid
+                    name={view.name()}
+                    entity={view.entity}
+                    listActions={view.listActions()}
+                    fields={view.getFields()}
+                    state={this.props.state}
+                    onSort={this.props.onSort}
+                />
+
+                {this.buildPagination(view)}
+            </div>
+        );
+    }
+}
+ObservableListView.propTypes = {
+    state: React.PropTypes.object.isRequired,
+    showFilter: React.PropTypes.func.isRequired,
+    hideFilter: React.PropTypes.func.isRequired,
+    updateFilterField: React.PropTypes.func.isRequired,
+    changePage: React.PropTypes.func.isRequired,
+    onSort: React.PropTypes.func.isRequired
+};
+
 class ListView extends React.Component {
 
     componentDidMount() {
@@ -106,91 +173,15 @@ class ListView extends React.Component {
         this._changeQuery({page: page});
     }
 
-    buildPagination(view) {
-        const totalItems = this.props.state.totalItems;
-        const page = +this.props.state.page;
-
-        return <MaDatagridPagination totalItems={totalItems} page={page}
-          perPage={view.perPage()} onChange={this.onPageChange.bind(this)} />;
-    }
-
-    buildFilters() {
-        if (this.props.state.visibleFilters.length > 0) {
-            return (
-                <Filters
-                    filters={this.props.state.visibleFilters}
-                    values={this.props.state.filterValues}
-                    entity={this.props.state.view.entity}
-                    dataStore={this.props.state.dataStore}
-                    hideFilter={this.hideFilter.bind(this)}
-                    updateField={this.updateFilterField.bind(this)} />
-            );
-        }
-    }
-
     render() {
-        if (this.props.state.loading) {
-          return null;
-        }
-
-        if (this.props.state.resourceNotFound) {
-            return <NotFoundView/>;
-        }
-
-        const dataStore = this.props.state.dataStore;
-        if(!dataStore) {
-          return null;
-        }
-
-        const entityName = this.props.state.entityName;
-        const view = this.props.state.view;
-        const filters = this.props.state.filters;
-        const sortDir = this.props.state.sortDir;
-        const sortField = this.props.state.sortField;
-
-        if(!view || ! view.listActions) {  // hack: not yet loaded. Solve with more optimal components
-          return null;
-        }
-
-        const entries = dataStore.getEntries(view.entity.uniqueId);
-        let datagrid = null;
-        let filter = null;
-
-        if (entries && entries.length) {
-            datagrid = (
-                <Datagrid
-                    name={view.name()}
-                    entityName={this.props.state.entityName}
-                    listActions={view.listActions()}
-                    fields={view.getFields()}
-                    entries={entries}
-                    sortDir={sortDir}
-                    sortField={sortField}
-                    onSort={this.onListSort.bind(this)}
-                />
-            );
-        }
-
-        return (
-            <div className="view list-view">
-                <ViewActions
-                    entityName={this.props.state.entityName}
-                    buttons={this.props.state.viewActions}
-                    filters={this.props.state.unselectedFilters}
-                    showFilter={this.showFilter.bind(this)} />
-
-                <div className="page-header">
-                    <h1>{view.title() || entityName + ' list'}</h1>
-                    <p className="description">{view.description()}</p>
-                </div>
-
-                {this.buildFilters()}
-
-                {datagrid}
-
-                {this.buildPagination(view)}
-            </div>
-        );
+        return <ObservableListView
+            state={this.props.state}
+            showFilter={this.showFilter.bind(this)}
+            hideFilter={this.hideFilter.bind(this)}
+            updateFilterField={this.updateFilterField.bind(this)}
+            changePage={this.onPageChange.bind(this)}
+            onSort={this.onListSort.bind(this)}
+        />
     }
 }
 

@@ -24,7 +24,7 @@ class Column extends React.Component {
         }
 
         const referenceEntity = field.targetEntity().name();
-        const relatedEntity = this.props.configuration.getEntity(referenceEntity);
+        const relatedEntity = this.context.configuration.getEntity(referenceEntity);
 
         if (!relatedEntity) { return false; }
 
@@ -56,6 +56,10 @@ Column.propTypes = {
     entity: React.PropTypes.object.isRequired,
     configuration: React.PropTypes.object.isRequired,
     dataStore: React.PropTypes.object
+};
+
+Column.contextTypes = {
+    configuration: React.PropTypes.object.isRequired
 };
 
 export default Column;

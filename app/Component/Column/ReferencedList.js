@@ -7,15 +7,13 @@ class ReferencedList extends React.Component {
 
         return (
             <Datagrid
-                entityName={entityName}
                 name={field.datagridName()}
                 actions={null}
                 listActions={[]}
                 fields={field.targetFields()}
-                entries={entries}
-                sortDir={sortDir}
-                sortField={sortField}
-                />
+                state={this.context.state}
+                entity={field.targetEntity()}
+            />
         );
     }
 }
@@ -27,7 +25,8 @@ ReferencedList.propTypes = {
 };
 
 ReferencedList.contextTypes = {
-    configuration: React.PropTypes.object.isRequired
+    configuration: React.PropTypes.object.isRequired,
+    state: React.PropTypes.object.isRequired
 };
 
 export default ReferencedList;

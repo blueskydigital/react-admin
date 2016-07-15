@@ -7,22 +7,10 @@ import Notification from '../Services/Notification';
 import NotFoundView from './NotFound';
 
 import ViewActions from '../Component/ViewActions';
-import EntityStore from '../Stores/EntityStore';
 import Field from '../Component/Field/Field';
 
 @observer
-class CreateView extends React.Component {
-
-    componentDidMount() {
-        this.props.state.loadCreateData(this.props.routeParams.entity);
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.params.entity !== this.props.params.entity) {
-            this.props.state.loadCreateData(nextProps.params.entity);
-        }
-    }
-
+class ObservedCreateView extends React.Component {
     updateField(name, value) {
         this.props.state.updateData(name, value);
     }
@@ -63,29 +51,26 @@ class CreateView extends React.Component {
     }
 
     render() {
-        if (this.props.state.resourceNotFound) {
-            return <NotFoundView/>;
+        const view = this.props.state.view;
+        if (! view || view.type != 'CreateView') {
+          return null;
         }
 
         const dataStore = this.props.state.dataStore;
-
         if(!dataStore) {
             return null;
         }
 
         const entityName = this.props.state.entityName;
-        const view = this.props.state.view;
-        const entry = dataStore.getFirstEntry(view.entity.uniqueId);
 
+        const entry = dataStore.getFirstEntry(view.entity.uniqueId);
         if (!entry) {
             return null;
         }
 
         return (
             <div className="view create-view">
-                <ViewActions entityName={entityName} entry={entry}
-                    buttons={this.props.state.viewActions}
-                />
+                <ViewActions state={this.props.state} />
 
                 <div className="page-header">
                     <h1><Compile entry={entry}>{view.title() || 'Create new ' + entityName}</Compile></h1>
@@ -108,6 +93,24 @@ class CreateView extends React.Component {
                 </div>
             </div>
         );
+    }
+}
+
+
+class CreateView extends React.Component {
+
+    componentDidMount() {
+        this.props.state.loadCreateData(this.props.routeParams.entity);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.params.entity !== this.props.params.entity) {
+            this.props.state.loadCreateData(nextProps.params.entity);
+        }
+    }
+
+    render() {
+        return <ObservedCreateView state={this.props.state} />
     }
 }
 

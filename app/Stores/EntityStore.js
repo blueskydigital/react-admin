@@ -18,7 +18,7 @@ export default class EntityStore extends BaseStore {
   @observable originEntityId = null;
   @observable entityName = null;
   @observable values = {};
-  @observable dataStore = null;
+  @observable dataStore = new DataStore();
   @observable totalItems = 0;
   @observable page = 1;
   @observable sortDir = null;
@@ -34,7 +34,7 @@ export default class EntityStore extends BaseStore {
   }
 
   @computed get unselectedFilters() {
-    return this.view ? this.view.filters() : [];
+    return (this.view && this.view.filters) ? this.view.filters() : [];
   }
 
   @action
@@ -50,7 +50,7 @@ export default class EntityStore extends BaseStore {
         .forEach((i) => this.visibleFilters.remove(i));
       this.loading = true;
     });
-    // update data    
+    // update data
     return this.requester.getEntries(new DataStore(), this.view, this.page, {
       references: true,
       choices: true,
@@ -161,8 +161,10 @@ export default class EntityStore extends BaseStore {
 
   @action
   loadListData(entityName, page = 1, sortField = null, sortDir = null, filters = null) {
-    this.view = this.getView(entityName, 'ListView');
-    this.loading = true;
+    transaction(() => {
+      this.view = this.getView(entityName, 'ListView');
+      this.loading = true;
+    });
 
     return this.requester.getEntries(new DataStore(), this.view, page, {
       references: true,
@@ -187,15 +189,16 @@ export default class EntityStore extends BaseStore {
 
   @action
   loadShowData(entityName, id, sortField, sortDir) {
-    let view = this.getView(entityName, 'ShowView');
-    this.loading = true;
+    transaction(() => {
+      this.view = this.getView(entityName, 'ShowView');
+      this.loading = true;
+    });
 
-    return this.requester.getEntry(view, id, {
+    return this.requester.getEntry(this.view, id, {
       references: true, referencesList: true, sortField, sortDir
     }).then((dataStore) => {
       transaction(() => {
         this.loading = false;
-        this.view = view;
         this.dataStore = dataStore;
       });
     });
@@ -203,17 +206,18 @@ export default class EntityStore extends BaseStore {
 
   @action
   loadEditData(entityName, id, sortField, sortDir) {
-    let view = this.getView(entityName, 'EditView');
-    this.loading = true;
+    transaction(() => {
+      this.view = this.getView(entityName, 'EditView');
+      this.loading = true;
+    });
 
-    return this.requester.getEntry(view, id, {
+    return this.requester.getEntry(this.view, id, {
       references: true, referencesList: true, choices: true, sortField, sortDir
     }).then((dataStore) => {
       transaction(() => {
         this.originEntityId = id;
         this.dataStore = dataStore;
-        this.view = view;
-        let entry = dataStore.getFirstEntry(view.entity.uniqueId);
+        let entry = dataStore.getFirstEntry(this.view.entity.uniqueId);
         for (let fieldName in entry.values) {
           this.values[fieldName] = entry.values[fieldName];
         }
@@ -224,15 +228,12 @@ export default class EntityStore extends BaseStore {
 
   @action
   loadCreateData(entityName) {
-    let view = this.getView(entityName, 'CreateView');
-
-    this.requester.createEntry(view)
-    .then((dataStore) => {
-      transaction(() => {
+    transaction(() => {
+      this.view = this.getView(entityName, 'CreateView');
+      this.requester.createEntry(this.view).then((dataStore) => {
         this.originEntityId = null;
-        this.view = view;
         this.dataStore = dataStore;
-        let entry = dataStore.getFirstEntry(view.entity.uniqueId);
+        let entry = dataStore.getFirstEntry(this.view.entity.uniqueId);
         for (let fieldName in entry.values) {
           const field = entry.values[fieldName];
           this.values[field.name()] = field.defaultValue();
@@ -243,16 +244,19 @@ export default class EntityStore extends BaseStore {
 
   @action
   loadDeleteData(entityName, id) {
-    let view = this.getView(entityName, 'DeleteView');
-    this.loading = true;
+    transaction(() => {
+      this.view = this.getView(entityName, 'DeleteView');
+      this.loading = true;
+    });
 
-    return this.requester.getEntry(view, id, {
+    return this.requester.getEntry(this.view, id, {
       references: true, referencesList: false, choices: false
     }).then((dataStore) => {
-      this.originEntityId = id;
-      this.view = view;
-      this.dataStore = dataStore;
-      this.loading = false;
+      transaction(() => {
+        this.originEntityId = id;
+        this.dataStore = dataStore;
+        this.loading = false;
+      });
     });
   }
 

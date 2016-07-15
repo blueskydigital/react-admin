@@ -1,14 +1,8 @@
 import React from 'react';
-import { shouldComponentUpdate } from 'react/lib/ReactComponentWithPureRenderMixin';
 import DropdownButton from 'react-bootstrap/lib/DropdownButton';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
 
 class FilterButton extends React.Component {
-    constructor(props, context) {
-        super(props, context);
-
-        this.shouldComponentUpdate = shouldComponentUpdate.bind(this);
-    }
 
     showFilter(filter) {
         return () => {
@@ -23,7 +17,7 @@ class FilterButton extends React.Component {
         const title = <span><span className="glyphicon glyphicon-filter" aria-hidden="true"></span>&nbsp;Add filters</span>;
 
         return (
-            <DropdownButton title={title}>
+            <DropdownButton id={this.props.entityName + "_filter_drop"} title={title}>
                 {buttons}
             </DropdownButton>
         );

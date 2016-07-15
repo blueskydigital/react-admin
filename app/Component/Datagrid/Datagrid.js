@@ -1,21 +1,17 @@
 import React from 'react';
-import { shouldComponentUpdate } from 'react/lib/ReactComponentWithPureRenderMixin';
+import { observer } from 'mobx-react';
 
 import Header from '../../Component/Datagrid/ColumnHeader';
 import DatagridActions from '../../Component/Datagrid/DatagridActions';
 
 import Column from '../Column/Column';
 
+@observer
 class Datagrid extends React.Component {
-    constructor(props, context) {
-        super(props, context);
-
-        this.shouldComponentUpdate = shouldComponentUpdate.bind(this);
-    }
 
     getDetailAction(entry) {
         return () => {
-            const entityName = this.props.entityName;
+            const entityName = this.props.state.entity.name();
             const entity = this.context.configuration.getEntity(entityName);
             const route = entity.editionView().enabled ? 'edit' : 'show';
             const to = `/${entityName}/${route}/${entry.identifierValue}`;
@@ -71,10 +67,11 @@ class Datagrid extends React.Component {
         return headers;
     }
 
-    buildRecords() {
-        const entity = this.context.configuration.getEntity(this.props.entityName);
+    buildRecords(entries) {
+        const entityName = this.props.state.view.entity.name();
+        const entity = this.context.configuration.getEntity(entityName);
 
-        return this.props.entries.map((r, i) => (
+        return entries.map((r, i) => (
             <tr key={i}>{this.buildCells(r, entity)}</tr>
         ));
     }
@@ -82,11 +79,11 @@ class Datagrid extends React.Component {
     buildCells(row, entity) {
         let cells = [];
         const actions = this.props.listActions;
-        const entityName = this.props.entityName;
+        const entityName = this.props.entity.name();
 
         for (let i in this.props.fields) {
             const field = this.props.fields[i];
-            const renderedField = <Column field={field} entity={entity} entry={row} />;
+            const renderedField = <Column field={field} entity={entity} entry={row} configuration={this.context.configuration} />;
 
             cells.push(<td key={i}>{renderedField}</td>);
         }
@@ -101,6 +98,11 @@ class Datagrid extends React.Component {
     }
 
     render() {
+        const entries = this.props.state.dataStore.getEntries(this.props.entity.uniqueId);
+        if(entries.length === 0) {
+            return null;
+        }
+
         return (
             <table className="datagrid">
                 <thead>
@@ -109,7 +111,7 @@ class Datagrid extends React.Component {
                     </tr>
                 </thead>
                 <tbody>
-                    {this.buildRecords()}
+                    {this.buildRecords(entries)}
                 </tbody>
             </table>
         );
@@ -118,12 +120,10 @@ class Datagrid extends React.Component {
 
 Datagrid.propTypes = {
     name: React.PropTypes.string.isRequired,
-    entityName: React.PropTypes.string.isRequired,
+    entity: React.PropTypes.object.isRequired,
     listActions: React.PropTypes.array.isRequired,
     fields: React.PropTypes.array.isRequired,
-    entries: React.PropTypes.array.isRequired,
-    sortDir: React.PropTypes.string,
-    sortField: React.PropTypes.string,
+    state: React.PropTypes.object.isRequired,
     onSort: React.PropTypes.func
 };
 

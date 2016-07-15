@@ -1,27 +1,17 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import { browserHistory } from 'react-router';
+import DevTools from 'mobx-react-devtools';
 
 import Compile from '../Component/Compile';
 import NotFoundView from './NotFound';
 
 import ViewActions from '../Component/ViewActions';
-import EntityStore from '../Stores/EntityStore';
 import Notification from '../Services/Notification';
 
+
 @observer
-class DeleteView extends React.Component {
-
-    componentDidMount() {
-        this.props.state.loadDeleteData(this.props.routeParams.entity, this.props.routeParams.id);
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.params.entity !== this.props.params.entity ||
-            nextProps.params.id !== this.props.params.id) {
-            this.props.state.loadDeleteData(nextProps.params.entity, nextProps.params.id);
-        }
-    }
+class ObservedDeleteView extends React.Component {
 
     delete(e) {
         e.preventDefault();
@@ -42,18 +32,17 @@ class DeleteView extends React.Component {
     }
 
     render() {
-        if (this.props.state.resourceNotFound) {
-            return <NotFoundView/>;
+        const view = this.props.state.view;
+        if(! view) {
+          return null;
         }
 
         const dataStore = this.props.state.dataStore;
-
         if(! dataStore) {
             return null;
         }
 
         const entityName = this.props.state.entityName;
-        const view = this.props.state.view;
         const entry = dataStore.getFirstEntry(view.entity.uniqueId);
 
         if (!entry) {
@@ -62,9 +51,10 @@ class DeleteView extends React.Component {
 
         return (
             <div>
+                <DevTools />
                 <div className="row">
                     <div className="col-lg-12">
-                        <ViewActions entityName={entityName} buttons={this.props.state.viewActions} />
+                        <ViewActions state={this.props.state} />
 
                         <div className="page-header">
                             <h1><Compile entry={entry}>{view.title() || 'Delete one ' + entityName}</Compile></h1>
@@ -82,6 +72,24 @@ class DeleteView extends React.Component {
                 </div>
             </div>
         );
+    }
+}
+
+class DeleteView extends React.Component {
+
+    componentDidMount() {
+        this.props.state.loadDeleteData(this.props.routeParams.entity, this.props.routeParams.id);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.params.entity !== this.props.params.entity ||
+            nextProps.params.id !== this.props.params.id) {
+            this.props.state.loadDeleteData(nextProps.params.entity, nextProps.params.id);
+        }
+    }
+
+    render() {
+      return <ObservedDeleteView state={this.props.state} />
     }
 }
 

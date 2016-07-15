@@ -1,5 +1,4 @@
 import React from 'react';
-import { observer } from 'mobx-react';
 import {RouteHandler, Link} from 'react-router';
 
 import Header from './View/Common/Header';
@@ -40,7 +39,6 @@ FieldViewConfiguration.registerFieldView('template', TemplateFieldView);
 FieldViewConfiguration.registerFieldView('text', TextFieldView);
 FieldViewConfiguration.registerFieldView('wysiwyg', WysiwygFieldView);
 
-@observer
 class AdminBootstrap extends React.Component {
     getChildContext() {
         return {
