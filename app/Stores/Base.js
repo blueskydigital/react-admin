@@ -3,9 +3,9 @@ import DataStore from 'admin-config/lib/DataStore/DataStore';
 
 export default class BaseStore {
 
-  constructor(requester, config) {
-    this.requester = requester;
+  setConfigAndRequester(config, requester) {
     this.config = config;
+    this.requester = requester;
   }
 
   hasEntityAndView(entityName) {

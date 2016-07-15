@@ -8,7 +8,7 @@ import ViewActions from './Component/ViewActions';
 import FieldViewConfiguration from './Field/FieldViewConfiguration';
 
 import autoload from './autoloader'
-import routes from './routes'
+import routesSetup from './routes'
 import NotFoundView from './View/NotFound';
 
 import RestWrapper from './Services/RestWrapper';
@@ -25,22 +25,33 @@ class ReactAdmin extends React.Component {
         const components = {
             ViewActions: ViewActions
         };
+        this.routes = null;
+        this.store = new EntityStore(); // single source of truth ..
+        let self = this;
+        function _setupRoutes(onEntry) {  // callback for instantiation of routes
+          self.routes = routesSetup(onEntry);
+          return self.routes;
+        }
+
         const configuration = props.configureApp(
             new ConfigurationFactory(),
             FieldViewConfiguration,
+            this.store,
+            _setupRoutes,
             components,
-            routes,
             restful,
             autoload
         );
 
-        // add default route
-        routes.props.children.push(<Route path="*" component={NotFoundView} />);
+        if(! this.routes) { // in case config has not setup routes calling _setupRoutes
+          this.routes = routesSetup();
+        }
 
-        this.store = new EntityStore(
-          new EntryRequester(configuration, new RestWrapper(restful)),
-          configuration
-        );
+        // add default route
+        this.routes.props.children.push(<Route path="*" component={NotFoundView} />);
+
+        let requester = new EntryRequester(configuration, new RestWrapper(restful))
+        this.store.setConfigAndRequester(configuration, requester);  // late inject of props
         this.configuration = configuration;
     }
 
@@ -67,7 +78,7 @@ class ReactAdmin extends React.Component {
 
         return (
           <Router history={browserHistory} createElement={createElement}>
-            {routes}
+            {this.routes}
           </Router>
         );
     }

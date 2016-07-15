@@ -10,7 +10,7 @@ import EComments from './entities/comment';
 import EPosts from './entities/post';
 import MyMenu from './menu';
 
-function configureApp(nga, fieldViewConfiguration, components, routes, restful, autoload) {
+function configureApp(nga, fieldViewConfiguration, store, setupRoutes, components, restful, autoload) {
 
     ApiFlavor.init(restful);
 
@@ -49,6 +49,15 @@ function configureApp(nga, fieldViewConfiguration, components, routes, restful, 
             </div>;
         }
     });
+
+    function customEnterHook(nextState, replace) {
+      // this redirec all urls that are concerning tag with id=5
+      // NOTE: can be used to check e.g. store.user.isLogged and redir to login
+      if(nextState.params.entity === "tags" && nextState.params.id === "5") {
+        replace('/');
+      }
+    }
+    let routes = setupRoutes(customEnterHook);
 
     routes.props.children.push(
       <Route name="stats" path="/stats" component={Stats} />
