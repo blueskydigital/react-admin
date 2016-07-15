@@ -166,6 +166,8 @@ class ListView extends React.Component {
             return a
         }, []).join('&');
 
+        // TODO: use https://github.com/reactjs/react-router/blob/master/docs/API.md#createpathpathorloc-query
+
         browserHistory.push(`${this.props.location.pathname}?${serialized}`);
     }
 
