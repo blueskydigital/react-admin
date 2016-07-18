@@ -1,7 +1,6 @@
 import React from 'react';
 import {RouteHandler, Link} from 'react-router';
 
-import Header from './View/Common/Header';
 import Sidebar from './View/Common/Sidebar';
 
 import FieldViewConfiguration from './Field/FieldViewConfiguration';
@@ -48,9 +47,10 @@ class AdminBootstrap extends React.Component {
     }
 
     render() {
+        const Header = this.props.configuration.components['Header'];
         return (
             <div>
-                <Header title={this.props.configuration.title()}/>
+                <Header title={this.props.configuration.title()} state={this.props.state} />
                 <Sidebar menuViews={this.props.configuration.menu()}/>
                 <div className="view-wrapper">
                     {this.props.children}

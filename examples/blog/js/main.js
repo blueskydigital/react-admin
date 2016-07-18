@@ -9,10 +9,15 @@ import ETags from './entities/tag';
 import EComments from './entities/comment';
 import EPosts from './entities/post';
 import MyMenu from './menu';
+import StateStore from './stateStore';
+import Login from './components/login';
+import CustomHeader from './components/header';
 
-function configureApp(nga, fieldViewConfiguration, store, setupRoutes, components, restful, autoload) {
+function configureApp(nga, fieldViewConfiguration, setupRoutes, components, restful, autoload) {
 
-    ApiFlavor.init(restful);
+    let state = new StateStore();
+
+    ApiFlavor.init(restful, state);
 
     // Add custom component
     var SendEmail = React.createClass({
@@ -38,6 +43,9 @@ function configureApp(nga, fieldViewConfiguration, store, setupRoutes, component
     // customize menu
     admin.menu(MyMenu(nga, admin));
 
+    // override component
+    components['Header'] = CustomHeader;
+
     // Add custom route
     var ViewActions = components.ViewActions;
     var Stats = React.createClass({
@@ -51,10 +59,10 @@ function configureApp(nga, fieldViewConfiguration, store, setupRoutes, component
     });
 
     function customEnterHook(nextState, replace) {
-      // this redirec all urls that are concerning tag with id=5
-      // NOTE: can be used to check e.g. store.user.isLogged and redir to login
+      // this redirect all urls concerning tag with id=5
+      // NOTE: can be used to check e.g. state.user.isLogged and redir to login
       if(nextState.params.entity === "tags" && nextState.params.id === "5") {
-        replace('/');
+        replace('/login');
       }
     }
     let routes = setupRoutes(customEnterHook);
@@ -62,8 +70,14 @@ function configureApp(nga, fieldViewConfiguration, store, setupRoutes, component
     routes.props.children.push(
       <Route name="stats" path="/stats" component={Stats} />
     );
+    routes.props.children.push(
+      <Route name="login" path="/login" component={Login} />
+    );
 
-    return admin;
+    return {
+      admin,
+      state
+    };
 }
 
 render(

@@ -5,6 +5,7 @@ import Restful from 'restful.js';
 import ConfigurationFactory from 'admin-config/lib/Factory';
 
 import ViewActions from './Component/ViewActions';
+import Header from './View/Common/Header';
 import FieldViewConfiguration from './Field/FieldViewConfiguration';
 
 import autoload from './autoloader'
@@ -23,25 +24,26 @@ class ReactAdmin extends React.Component {
 
         const restful = Restful();
         const components = {
-            ViewActions: ViewActions
+            ViewActions: ViewActions,
+            Header: Header
         };
         this.routes = null;
-        this.store = new EntityStore(); // single source of truth ..
         let self = this;
         function _setupRoutes(onEntry) {  // callback for instantiation of routes
           self.routes = routesSetup(onEntry);
           return self.routes;
         }
 
-        const configuration = props.configureApp(
+        const { admin, state } = props.configureApp(
             new ConfigurationFactory(),
             FieldViewConfiguration,
-            this.store,
             _setupRoutes,
             components,
             restful,
             autoload
         );
+
+        admin.components = components;
 
         if(! this.routes) { // in case config has not setup routes calling _setupRoutes
           this.routes = routesSetup();
@@ -50,9 +52,10 @@ class ReactAdmin extends React.Component {
         // add default route
         this.routes.props.children.push(<Route path="*" component={NotFoundView} />);
 
-        let requester = new EntryRequester(configuration, new RestWrapper(restful))
-        this.store.setConfigAndRequester(configuration, requester);  // late inject of props
-        this.configuration = configuration;
+        let requester = new EntryRequester(admin, new RestWrapper(restful))
+        this.store = state;
+        this.configuration = admin;
+        this.store.setConfigAndRequester(admin, requester);  // late inject of props
     }
 
     // componentDidUpdate() {
