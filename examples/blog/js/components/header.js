@@ -22,7 +22,7 @@ export default class Header extends React.Component {
             {this.props.title} | custom header
           </Link>
         </h1>
-        <div className="pull-right navbar">
+        <div className="pull-right">
           {this.userInfo()}
         </div>
       </header>
