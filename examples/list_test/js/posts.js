@@ -8,6 +8,7 @@ import MenuItem from 'material-ui/MenuItem'
 import TextField from '../../../src/components/field/text'
 import TextInput from '../../../src/components/input/text'
 import ListView from '../../../src/views/list'
+import EditView from '../../../src/views/edit'
 
 export default (state) => {
 
@@ -49,6 +50,26 @@ export default (state) => {
       return (
         <ListView {...props} fields={fields} entityName='posts' title='posts'
           listActions={listActions} actions={batchActions} filters={filters} />
+      )
+    },
+
+    'createManip': (props) => {
+
+      var fields = {
+        'title': {
+          component: (prps) => (<TextInput attr="title" label={'Title'} {...prps} />),
+          validators: [
+            {fn: (val) => (val.length === 0), message: "title must be provided"},
+            {fn: (val) => (val.length > 10), message: "title too long"},
+          ]
+        },
+        'category': {
+          component: (prps) => (<TextInput attr="category" label={'Category'} {...prps} />)
+        }
+      }
+
+      return (
+        <EditView {...props} fields={fields} entityName='posts' createtitle='create post' />
       )
     }
   }

@@ -1,13 +1,16 @@
 import React from 'react'
+import { observer } from 'mobx-react'
 import TextField from 'material-ui/TextField'
 
+@observer
 class TextInput extends React.Component {
 
   static propTypes = {
     attr: React.PropTypes.string.isRequired,
     record: React.PropTypes.object.isRequired,
     label: React.PropTypes.string,
-    onChange: React.PropTypes.func.isRequired
+    onChange: React.PropTypes.func.isRequired,
+    errors: React.PropTypes.object
   }
 
   handleChange = (event) => {
@@ -15,10 +18,12 @@ class TextInput extends React.Component {
   }
 
   render() {
-    const { attr, label, record } = this.props
+    const { attr, label, record, errors } = this.props
+    const errorText = errors ? errors.get(attr) : undefined
     return (
       <TextField name={attr} floatingLabelText={label}
-        value={record[attr] || ''} onChange={this.handleChange} />
+        value={record[attr] || ''} onChange={this.handleChange}
+        errorText={errorText} />
     )
   }
 }

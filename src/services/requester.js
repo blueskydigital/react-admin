@@ -35,23 +35,19 @@ class DataRequester {
 
   }
 
-  createEntry(view) {
+  getEntry(entityName, id, options={}) {
+
+    return axios.get(`${Conf.apiUrl}/${entityName}/${id}`)
 
   }
 
-  getEntry(id, entityName, options={}) {
-
-    return axios.get(`${Conf.apiUrl}/${entityName}/${id}`);
-
-  }
-
-  saveEntry(data, id=null) {
+  saveEntry(entityName, data, id=null) {
       let query;
 
       if (id) {
-        query = axios.put(`${Conf.apiUrl}/${data.Type}/${id}`, data)
+        query = axios.put(`${Conf.apiUrl}/${entityName}/${id}`, data)
       } else {
-        query = axios.post(`${Conf.apiUrl}/${data.Type}`, data)
+        query = axios.post(`${Conf.apiUrl}/${entityName}`, data)
       }
 
       return query.then((response) => {

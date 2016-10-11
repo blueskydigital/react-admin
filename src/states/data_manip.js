@@ -1,100 +1,75 @@
-import {observable, computed, autorun, action, transaction} from 'mobx'
-import BaseState from './base'
+import {observable, computed, action, transaction, asMap} from 'mobx'
 
-export default class DataManipState extends BaseState {
+export default class DataManipState {
 
   @observable originEntityId = null
   @observable entityName = null
-  @observable entity = {}
+  @observable entity = asMap({})
+  @observable errors = asMap({})
 
   @action
   loadEditData(entityName, id, sortField, sortDir) {
     transaction(() => {
-      this.view = this.getView(entityName, 'EditView');
-      this.loading = true;
-    });
+      this.originEntityId = id
+      this.loading = true
+    })
 
-    return this.requester.getEntry(this.view, id, {
-      references: true, referencesList: true, choices: true, sortField, sortDir
-    }).then((dataStore) => {
+    return this.requester.getEntry(entityName, id).then((result) => {
       transaction(() => {
-        this.originEntityId = id;
-        this.dataStore = dataStore;
-        let entry = dataStore.getFirstEntry(this.view.entity.uniqueId);
-        for (let fieldName in entry.values) {
-          this.values[fieldName] = entry.values[fieldName];
-        }
-        this.loading = false;
-      });
-    });
+        // this.entity.clear()
+        // this.entity.merge(result.data)
+        this.entity = result.data
+        this.loading = false
+      })
+    })
   }
 
   @action
-  loadCreateData(entityName) {
+  loadCreateData(fields) {
     transaction(() => {
-      this.view = this.getView(entityName, 'CreateView');
-      this.requester.createEntry(this.view).then((dataStore) => {
-        this.originEntityId = null;
-        this.dataStore = dataStore;
-        let entry = dataStore.getFirstEntry(this.view.entity.uniqueId);
-        for (let fieldName in entry.values) {
-          const field = entry.values[fieldName];
-          this.values[field.name()] = field.defaultValue();
-        }
-      });
-    });
+      this.originEntityId = null
+      this.entity.clear()
+      for (let name in fields) {
+        this.entity[name] = fields[name].defaultVal
+      }
+    })
   }
 
-  // called on each update of edit form. Validation performed here?
-  @action
-  updateData(fieldName, value, choiceFields=[]) {
-    this.values[fieldName] = value;
-
-    // Handle related values between choice fields
-    if (choiceFields.length) {
-        choiceFields.map((field) => {
-            if (fieldName === field.name()) {
-                return;
-            }
-
-            let choices = field.choices();
-            if ('function' === typeof choices) {
-                choices = choices({ values: this.values });
-            }
-
-            let valueInChoices = false;
-            choices.map((v) => {
-                if (v.value === this.values[field.name()]) {
-                    valueInChoices = true;
-                }
-            });
-
-            if (!valueInChoices) {
-                this.values[field.name()] = null;
-            }
-        });
+  _validateField(fieldName, value, validators) {
+    let errors = []
+    validators.forEach((v) => {
+      if(v.fn(value) === true) {
+        errors.push(v.message)
+      }
+    })
+    if(errors.length === 0 && this.errors.has(fieldName)) {
+      this.errors.delete(fieldName)
+    } else if (errors.length > 0) {
+      this.errors.set(fieldName, errors)
     }
   }
 
+  // called on each update of edit form. Validation performed if got some validators
   @action
-  saveData() {
-    this.loading = true;
-    const id = this.originEntityId;
+  updateData(fieldName, value, validators) {
+    transaction(() => {
+      this.entity[fieldName] = value
+      if(validators) {
+        this._validateField(fieldName, value, validators)
+      }
+    })
+  }
 
-    let rawEntry = {};
-    for (let name in this.values) {
-        rawEntry[name] = this.values[name];
-    }
+  @action
+  saveData(entityName) {
+    this.loading = true
+    const id = this.originEntityId
 
-    return this.requester
-      .saveEntry(this.dataStore, this.view, rawEntry, id)
-      .then((dataStore) => {
-        transaction(() => {
-          this.dataStore = dataStore;
-          this.loading = false;
-        });
-        return dataStore;
-      });
+    return this.requester.saveEntry(entityName, this.entity, id).then((result) => {
+      transaction(() => {
+        this.loading = false
+      })
+    })
   }
 
 }
