@@ -1,90 +1,34 @@
 {
-  "name": "react-admin",
-  "version": "0.0.3",
-  "description": "React.js admin GUI for RESTful API",
+  "name": "react-mobx-admin",
+  "version": "1.0.0",
+  "description": "",
   "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server --content-base examples/list_test --inline --hot"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "jsx-transform": "^2.3.0",
-    "mobx": "^2.3.3",
-    "react": "~0.14.8",
-    "react-medium-editor": "blueskydigital/react-medium-editor",
-    "react-router": "^2.4.0"
+    "axios": "^0.14.0",
+    "material-ui": "^0.16.0",
+    "mobx": "^2.3.7",
+    "mobx-react": "^3.5.1",
+    "react": "^15.2.1",
+    "react-dom": "^15.3.0",
+    "react-tap-event-plugin": "^1.0.0"
   },
   "devDependencies": {
-    "admin-config": "^0.2.4",
-    "babel-jest": "^12.0.2",
+    "babel-core": "^6.17.0",
     "babel-loader": "^6.2.4",
+    "babel-plugin-transform-class-properties": "^6.10.2",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-preset-es2015": "^6.9.0",
-    "babel-preset-react": "^6.5.0",
-    "babel-preset-stage-0": "^6.5.0",
-    "classnames": "^2.1.2",
-    "css-loader": "^0.23.1",
-    "enzyme": "^2.0.0",
-    "extract-text-webpack-plugin": "^1.0.1",
-    "flux": "^2.0.3",
-    "format-json": "^1.0.3",
-    "humane-js": "^3.2.2",
-    "immutable": "^3.7.3",
-    "inflected": "^1.1.6",
-    "jest-cli": "*",
-    "lodash": "^3.10.0",
-    "medium-editor": "^4.12.5",
-    "mocha": "^2.5.3",
-    "moment": "^2.10.3",
-    "object-assign": "^2.1.1",
-    "pace": "HubSpot/pace",
-    "protractor": "^2.1.0",
-    "rc-upload": "^1.2.1",
-    "react-addons": "^0.9.0",
-    "react-addons-test-utils": "*",
-    "react-bootstrap-datetimepicker": "0.0.22",
-    "react-codemirror": "^0.2.6",
-    "react-select": "^0.9.1",
-    "restful.js": "^0.7.0",
-    "sinon": "^1.17.4",
-    "webpack": "^1.13.1"
-  },
-  "scripts": {
-    "test": "make test"
-  },
-  "keywords": [
-    "react",
-    "admin",
-    "rest"
-  ],
-  "author": "marmelab <info@marmelab.com>",
-  "license": "MIT",
-  "babel": {
-    "presets": [
-      "es2015",
-      "react",
-      "stage-0"
-    ],
-    "plugins": [
-      "transform-decorators-legacy"
-    ],
-    "ignore": null
-  },
-  "jest": {
-    "verbose": true,
-    "preprocessorIgnorePatterns": [],
-    "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",
-    "unmockedModulePathPatterns": [
-      "react",
-      "react-dom",
-      "react-addons-test-utils",
-      "fbjs",
-      "enzyme",
-      "cheerio",
-      "htmlparser2",
-      "underscore",
-      "lodash",
-      "domhandler",
-      "object.assign",
-      "define-properties",
-      "function-bind",
-      "object-keys"
-    ]
+    "babel-preset-react": "^6.11.1",
+    "json-server": "^0.8.22",
+    "mobx-react-devtools": "^4.2.6",
+    "react-addons-test-utils": "^15.3.0",
+    "webpack": "^1.13.1",
+    "webpack-dev-server": "^1.14.1"
   }
 }
