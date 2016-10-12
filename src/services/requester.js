@@ -1,37 +1,22 @@
-import axios from 'axios';
+import axios from 'axios'
 
 class DataRequester {
 
-  _apiFlavor(q) {
-    const perPage = q.perPage || 10
-    let converted = {
-      _start: (q.page - 1) * perPage,
-      _limit: perPage
-    }
-    if(q.sortField) {
-      converted._sort = q.sortField
-      converted._order = q.sortDir
-    }
-    for(let i in q.filters) {
-      converted[i] = q.filters[i]
-    }
-    return converted
-  }
-
-  _getResponseTotalItems(response) {
-    return parseInt(response.headers['x-total-count']) || response.data.length;
+  constructor(convertQuery, getTotalItems) {
+    this.convertQuery = convertQuery
+    this.getTotalItems = getTotalItems
   }
 
   getEntries(entityName, params) {
 
-    let qParams = this._apiFlavor(params);
+    let qParams = this.convertQuery(params)
 
     return axios.get(`${Conf.apiUrl}/${entityName}`, {params: qParams}).then((response) => {
       return {
         data: response.data,
-        totalItems: this._getResponseTotalItems(response)
-      };
-    });
+        totalItems: this.getTotalItems(response)
+      }
+    })
 
   }
 
@@ -42,17 +27,17 @@ class DataRequester {
   }
 
   saveEntry(entityName, data, id=null) {
-      let query;
+    let query
 
-      if (id) {
-        query = axios.put(`${Conf.apiUrl}/${entityName}/${id}`, data)
-      } else {
-        query = axios.post(`${Conf.apiUrl}/${entityName}`, data)
-      }
+    if (id) {
+      query = axios.put(`${Conf.apiUrl}/${entityName}/${id}`, data)
+    } else {
+      query = axios.post(`${Conf.apiUrl}/${entityName}`, data)
+    }
 
-      return query.then((response) => {
-        return response.data;
-      });
+    return query.then((response) => {
+      return response.data
+    })
   }
 }
 

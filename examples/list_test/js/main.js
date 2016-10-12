@@ -1,13 +1,16 @@
 import React from 'react'
 import { render } from 'react-dom'
 import DevTools from 'mobx-react-devtools'
-import { Router, Route, IndexRoute, browserHistory } from 'react-router'
-import TableState from '../../../src/states/data_table'
+import { Router, Route, IndexRedirect, browserHistory } from 'react-router'
+// import TableState from '../../../src/states/data_table'
+import ManipState from '../../../src/states/data_manip'
 import DataRequester from '../../../src/services/requester'
+import { convertQuery, getTotalItems } from './api_flavor'
 
+const _requester = new DataRequester(convertQuery, getTotalItems)
 
-let state = new TableState()
-state.requester = new DataRequester()
+let state = new ManipState()
+state.requester = _requester
 
 function i18n(str) {
   return state.i18n[str]
@@ -45,7 +48,9 @@ var createElement = function (Component, props) {
 let app = (
   <Router history={browserHistory} createElement={createElement}>
     <Route path="/" component={AppComponent}>
-      <IndexRoute component={postConfig.createListView} />
+      <IndexRedirect to="/posts/1" />
+      <Route path="/posts" component={postConfig.createListView} />
+      <Route path="/posts/:id" component={postConfig.createManip} />
     </Route>
   </Router>
 )
