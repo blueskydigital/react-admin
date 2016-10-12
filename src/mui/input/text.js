@@ -23,7 +23,7 @@ class TextInput extends React.Component {
     return (
       <TextField name={attr} floatingLabelText={label}
         value={record[attr] || ''} onChange={this.handleChange}
-        errorText={errorText} />
+        errorText={errorText} fullWidth={true} />
     )
   }
 }

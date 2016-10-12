@@ -16,9 +16,8 @@ function i18n(str) {
   return state.i18n[str]
 }
 
-import PostsConfig from './posts'
-
-let postConfig = PostsConfig(state)
+import PostEditView from './posts/manip'
+import PostListView from './posts/list'
 
 import injectTapEventPlugin from 'react-tap-event-plugin'
 
@@ -49,8 +48,8 @@ let app = (
   <Router history={browserHistory} createElement={createElement}>
     <Route path="/" component={AppComponent}>
       <IndexRedirect to="/posts/1" />
-      <Route path="/posts" component={postConfig.createListView} />
-      <Route path="/posts/:id" component={postConfig.createManip} />
+      <Route path="/posts" component={PostListView.createListView} />
+      <Route path="/posts/:id" component={PostEditView} />
     </Route>
   </Router>
 )
