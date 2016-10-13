@@ -1,14 +1,10 @@
 import React from 'react'
 import { observer } from 'mobx-react'
 import _ from 'lodash'
-import {
-  Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn
-} from 'material-ui/Table'
-
 import Header from './header'
 
-@observer
-class Datagrid extends React.Component {
+
+export default class DatagridBase extends React.Component {
 
   static propTypes = {
     fields: React.PropTypes.object.isRequired,
@@ -18,17 +14,12 @@ class Datagrid extends React.Component {
   }
 
   buildHeaders() {
-    const { name, listActions } = this.props
+    const { name, listActions, onSort } = this.props
     const { sortDir, sortField } = this.props.state
 
     let headers = _.map(this.props.fields, (val, name) => {
       const sort = (sortField === name) ? sortDir : null
-      return (
-        <TableHeaderColumn key={`th_${name}`}>
-          <Header sort={sort} name={name} label={val.title}
-            onSort={this.props.onSort} />
-        </TableHeaderColumn>
-      )
+      return this.renderHeader(Header, name, val.title, sort, onSort)
     })
 
     // add another th for List actions if any
@@ -41,13 +32,11 @@ class Datagrid extends React.Component {
 
   buildCells(row, idAttr='id') {
     let cells = _.map(this.props.fields, (val, name) => {
-      return (<TableRowColumn key={`td_${row[idAttr]}_${name}`}>{val.creator(row)}</TableRowColumn>)
+      return this.renderCell(row, name, val.creator, idAttr)
     })
 
     if (this.props.listActions) {
-        cells.push(<TableRowColumn key={'datagrid-actions'}>
-            {this.props.listActions(row)}
-        </TableRowColumn>)
+      cells.push(this.renderListActions(this.props.listActions(row)))
     }
 
     return cells
@@ -73,4 +62,3 @@ class Datagrid extends React.Component {
     )
   }
 }
-export default Datagrid
