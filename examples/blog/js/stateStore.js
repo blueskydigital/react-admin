@@ -9,14 +9,14 @@ export default class StateStore extends DataTableState {
   @action
   login(credentials) {
     let self = this
-    this.reqCount++
+    this.incRecCount()
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         self.loggedUser = {
           uname: credentials.uname,
           name: 'gandalf the gray'
         }
-        this.reqCount--
+        this.decRecCount()
         resolve(toJS(self.loggedUser))
       }, Math.random() * 2000 + 1000)
     })

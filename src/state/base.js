@@ -6,16 +6,26 @@ export default class BaseState {
     this.requester = requester
   }
 
-  @observable reqCount = 0
+  @observable req = {count: 0}
 
   @computed get loading() {
-    this.reqCount > 0
+    return this.req.count > 0
+  }
+
+  @action
+  incRecCount() {
+    this.req.count++
+  }
+
+  @action
+  decRecCount() {
+    this.req.count--
   }
 
   callRequester(fn) {
-    this.reqCount++
+    this.req.count++
     return fn().then(() => {
-      this.reqCount--
+      this.req.count--
     })
   }
 
