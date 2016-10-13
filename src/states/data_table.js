@@ -1,4 +1,4 @@
-import {observable, computed, action, transaction} from 'mobx'
+import {observable, computed, action, transaction, asMap} from 'mobx'
 
 export default class DataTableState {
 
@@ -59,11 +59,18 @@ export default class DataTableState {
 
   // ---------------------- filtration  ----------------------------
 
-  @observable filters = {}
+  @observable filters = asMap({})
+
+  @action
+  resetFilters(newFilters = {}) {
+    transaction(() => {
+      _resetFilters(newFilters)
+    })
+  }
 
   @action
   updateFilterValue(name, value) {
-    this.filters[name] = value
+    this.filters.set(name, value)
   }
 
   @action
@@ -74,12 +81,19 @@ export default class DataTableState {
 
   @action
   showFilter(filter) {
-    this.filters[filter] = undefined
+    this.filters.set(filter, undefined)
   }
 
   @action
   hideFilter(filter) {
-    delete this.filters[filter]
+    this.filters.delete(filter)
+  }
+
+  _resetFilters(newFilters) {
+    this.filters.clear()
+    for(let i in newFilters) {
+      this.filters.set(i, newFilters[i])
+    }
   }
 
   // ---------------------- privates, support ----------------------------
@@ -95,7 +109,7 @@ export default class DataTableState {
         this.page = page
         this.sortField = sortField
         this.sortDir = sortDir
-        this.filters = filters
+        this._resetFilters(filters)
         this.totalItems = result.totalItems
         this.items.replace(result.data)
         this.loading = false

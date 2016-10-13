@@ -11,18 +11,21 @@ class DropdownBase extends React.Component {
   }
 
   createItems(state, filters) {
+    const onShowFilter = this.props.showFilter
     return _.map(filters, (val, name) => {
-      if(name in state.filters) {
+      if(state.filters.has(name)) {
         return null // don't add to menu already visible filters
       } else {
-        const showFilter = () => {
-          state.showFilter(name)
-        }
-        return this.renderItem(name, val.title, val.icon, showFilter)
+        return this.renderItem(name, val.title, val.icon, () => {onShowFilter(name)})
       }
     })
   }
 
+  render() {
+    const { filters, state } = this.props
+    const show = state.filters.size < Object.keys(filters).length
+    return (show) ? this.renderMenu(state, filters) : null
+  }
 }
 
 // controls to set filter values
@@ -38,7 +41,7 @@ class ControlsBase extends React.Component {
   buildRows(filters, state) {
     let rows = []
     for(let name in filters) {
-      if(name in state.filters) {  // is visible
+      if(state.filters.has(name)) {  // is visible
         const value = state.filters[name]
         const filter = filters[name]
         const onHide = () => {this.props.hideFilter(name)}
@@ -53,8 +56,8 @@ class ControlsBase extends React.Component {
   render() {
     const { filters, apply, state } = this.props
     const controls = this.buildRows(filters, state)
-
-    return (controls.length > 0) ? this.renderControls(controls, apply) : null
+    const show = controls.length > 0 && state.filters.size > 0
+    return (show) ? this.renderControls(controls, apply) : null
   }
 }
 

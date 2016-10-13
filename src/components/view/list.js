@@ -1,19 +1,14 @@
 import React from 'react'
 import { browserHistory } from 'react-router'
 
-import Datagrid from '../datagrid/datagrid'
-import Pagination from '../datagrid/pagination'
-import DatagridActions from '../datagrid/actions'
-import Filters from '../datagrid/filters'
-
 
 export default class ListViewBase extends React.Component {
 
   componentDidMount() {
-    const { entityName, state, filters, location } = this.props
+    const { entityName, state, location } = this.props
     const { page, sortField, sortDir } = location.query
     let filterVals = undefined
-    if(filters && location.query.filters) {
+    if(location.query.filters) {
       try {
         filterVals = JSON.parse(location.query.filters)
       } catch(err) {
@@ -35,7 +30,7 @@ export default class ListViewBase extends React.Component {
       const newFilters = nextProps.location.query.filters
       try {
         const filterVals = newFilters ? JSON.parse(newFilters) : {}
-        state.updateFilters(filterVals)
+        state.resetFilters(filterVals)
       } catch(err) {
 
       }
@@ -44,18 +39,22 @@ export default class ListViewBase extends React.Component {
 
   showFilter(filter) {
     this.props.state.showFilter(filter)
+    this._setFilterQuery()
   }
 
   hideFilter(filter) {
     this.props.state.hideFilter(filter)
-    this.updateFilters()
+    this._setFilterQuery()
   }
 
   applyFilters() {
-    const currFilters = this.props.state.filters
     this.props.state.applyFilters()
+    this._setFilterQuery()
+  }
 
-    if (0 === Object.keys(currFilters).length) {
+  _setFilterQuery() {
+    const currFilters = this.props.state.filters
+    if(currFilters.size === 0) {
       return this._changeQuery({filters: null})
     } else {
       this._changeQuery({filters: currFilters})
@@ -94,29 +93,4 @@ export default class ListViewBase extends React.Component {
     this.props.state.updateSelection(data)
   }
 
-  render() {
-    const {title, desc, fields, actions, filters} = this.props
-
-    return (
-      <div className="view list-view">
-        <div className="page-header">
-          <div style={{float: 'right'}}>
-            {actions ? (<DatagridActions state={this.props.state} actions={actions} />) : null}
-          </div>
-          <div style={{float: 'right'}}>
-            {filters ? (<Filters.Dropdown state={this.props.state} filters={filters} showFilter={this.showFilter.bind(this)} />) : null}
-          </div>
-          <h2>{title}</h2>
-          {desc? <p className="description">{desc}</p> : null}
-          {filters ? (<Filters.Controls state={this.props.state}
-            hideFilter={this.hideFilter.bind(this)} filters={filters}
-            apply={this.updateFilters.bind(this)} />
-          ) : null}
-        </div>
-
-        <Datagrid state={this.props.state} fields={fields} onSort={this.onListSort.bind(this)} onRowSelection={this.onSelect.bind(this)} />
-        <Pagination state={this.props.state} onChange={this.onPageChange.bind(this)} />
-      </div>
-    )
-  }
 }

@@ -16,9 +16,7 @@ class Dropdown extends FilterBases.DropdownBase {
     )
   }
 
-  render() {
-    const { filters, state } = this.props
-
+  renderMenu(state, filters) {
     return (
       <IconMenu iconButtonElement={<IconButton><ContentFilter /></IconButton>}>
         {this.createItems(state, filters)}
