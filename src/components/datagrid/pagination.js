@@ -1,8 +1,6 @@
 import React from 'react'
-import { observer } from 'mobx-react'
 
-@observer
-class DatagridPagination extends React.Component {
+export default class PaginationBase extends React.Component {
 
   static propTypes = {
       state: React.PropTypes.object.isRequired,
@@ -13,14 +11,15 @@ class DatagridPagination extends React.Component {
     return () => { this.props.onChange(page); };
   }
 
-  range(page, nbPages) {
-    let input = [];
+  range(page, perPage, total) {
+    const input = [];
+    const nbPages = Math.ceil(total / perPage) || 1;
 
     // display page links around the current page
     if (page > 2) {
         input.push('1');
     }
-    if (4 == page) {
+    if (page === 4) {
         input.push('2');
     }
     if (page > 4) {
@@ -33,7 +32,7 @@ class DatagridPagination extends React.Component {
     if (page < nbPages) {
         input.push(page + 1);
     }
-    if (page == (nbPages - 3)) {
+    if (page === (nbPages - 3)) {
         input.push(nbPages - 1);
     }
     if (page < (nbPages - 3)) {
@@ -43,73 +42,7 @@ class DatagridPagination extends React.Component {
         input.push(nbPages);
     }
 
-    return input
+    return input;
   }
 
-  render() {
-    const totalItems = this.props.state.totalItems
-    const page = parseInt(this.props.state.page) || 1
-    const perPage = parseInt(this.props.state.perPage) || 1
-    const nbPages = Math.ceil(totalItems / perPage) || 1
-    const offsetEnd = Math.min(page * perPage, totalItems)
-    const offsetBegin = Math.min((page - 1) * perPage + 1, offsetEnd)
-    const displayPagination = perPage < totalItems
-
-    let itemCount = null;
-    let pagination = null;
-
-    if (totalItems > 0) {
-        itemCount = (
-            <div className="total">
-                <strong>{ offsetBegin }</strong> - <strong>{ offsetEnd }</strong> on <strong>{ totalItems }</strong>
-            </div>
-        );
-    } else {
-        itemCount = (
-            <div className="total no-record">
-                <strong>No record found.</strong>
-            </div>
-        );
-    }
-
-    if (displayPagination) {
-        let prev = <li></li>;
-        let next = <li></li>;
-        let items = [];
-
-        if (page != 1) {
-            prev = <li><a className="prev" onClick={this.onChange(page - 1)}>« Prev</a></li>;
-        }
-
-        if (page != nbPages) {
-            next = <li><a className="next" onClick={this.onChange(page + 1)}>Next »</a></li>;
-        }
-
-        this.range(page, nbPages).map(i => {
-            const className = i == page ? 'active' : '';
-
-            if ('.' == i) {
-                items.push(<li key={i} className={className}><span>&hellip;</span></li>);
-            } else {
-                items.push(<li key={i} className={className}><a to="list" onClick={this.onChange(i)}>{i}</a></li>);
-            }
-        });
-
-        pagination = (
-            <ul className="pagination pagination-sm pull-right" role="group">
-                {prev}
-                {items}
-                {next}
-            </ul>
-        )
-    }
-
-    return (
-      <nav className="pagination-bar">
-          {itemCount}
-          {pagination}
-      </nav>
-    )
-  }
 }
-export default DatagridPagination

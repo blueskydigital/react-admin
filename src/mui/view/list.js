@@ -2,7 +2,7 @@ import React from 'react'
 
 import Datagrid from '../datagrid/datagrid'
 import Filters from '../datagrid/filters'
-import Pagination from '../../components/datagrid/pagination'
+import Pagination from '../datagrid/pagination'
 import DatagridActions from '../../components/datagrid/actions'
 
 
