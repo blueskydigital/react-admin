@@ -1,4 +1,4 @@
-import { observable, action } from 'mobx'
+import { observable, action, computed } from 'mobx'
 
 export default class BaseState {
 
@@ -10,6 +10,13 @@ export default class BaseState {
 
   @computed get loading() {
     this.reqCount > 0
+  }
+
+  callRequester(fn) {
+    this.reqCount++
+    return fn().then(() => {
+      this.reqCount--
+    })
   }
 
 }

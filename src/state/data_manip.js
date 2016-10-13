@@ -1,6 +1,7 @@
 import {observable, computed, action, transaction, asMap} from 'mobx'
+import BaseState from './base'
 
-export default class DataManipState {
+export default class DataManipState extends BaseState {
 
   @observable originEntityId = null
   @observable entityName = null
@@ -9,17 +10,15 @@ export default class DataManipState {
 
   @action
   loadEditData(entityName, id, sortField, sortDir) {
-    transaction(() => {
-      this.originEntityId = id
-      this.loading = true
-    })
+    this.originEntityId = id
 
-    return this.requester.getEntry(entityName, id).then((result) => {
-      transaction(() => {
-        // this.entity.clear()
-        // this.entity.merge(result.data)
-        this.entity = result.data
-        this.loading = false
+    return this.callRequester(() => {
+      return this.requester.getEntry(entityName, id).then((result) => {
+        transaction(() => {
+          // this.entity.clear()
+          // this.entity.merge(result.data)
+          this.entity = result.data
+        })
       })
     })
   }
@@ -62,13 +61,10 @@ export default class DataManipState {
 
   @action
   saveData(entityName) {
-    this.loading = true
     const id = this.originEntityId
 
-    return this.requester.saveEntry(entityName, this.entity, id).then((result) => {
-      transaction(() => {
-        this.loading = false
-      })
+    return this.callRequester(() => {
+      return this.requester.saveEntry(entityName, this.entity, id)
     })
   }
 

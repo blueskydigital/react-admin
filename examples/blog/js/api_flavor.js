@@ -1,39 +1,20 @@
 
-export function requestInterceptor(params) {
-    if (params._page) {
-        var start = (params._page - 1) * params._perPage;
-        var end = params._page * params._perPage - 1;
-        params.range = "[" + start + "," + end + "]";
-        delete params._page;
-        delete params._perPage;
-    }
-    if (params._sortField) {
-        params.sort = '["' + params._sortField + '","' + params._sortDir + '"]';
-        delete params._sortField;
-        delete params._sortDir;
-    }
-    if (params._filters) {
-        params.filter = params._filters;
-        delete params._filters;
-    }
-
-    return {
-        params: params
-    };
+export function convertQuery(q) {
+  const perPage = q.perPage || 10
+  let converted = {
+    _start: (q.page - 1) * perPage,
+    _limit: perPage
+  }
+  if(q.sortField) {
+    converted._sort = q.sortField
+    converted._order = q.sortDir
+  }
+  for(let i in q.filters) {
+    converted[i] = q.filters[i]
+  }
+  return converted
 }
 
-export function responseInterceptor(data, headers) {
-    if (headers['content-range']) {
-        headers['X-Total-Count'] = headers['content-range'].split('/').pop();
-    }
-
-    return {
-        headers: headers
-    };
+export function getTotalItems(response) {
+  return parseInt(response.headers['x-total-count']) || response.data.length
 }
-
-// add the interceptors ...
-export function init(restful) {
-  restful.addFullRequestInterceptor(requestInterceptor);
-  restful.addFullResponseInterceptor(responseInterceptor);
-};

@@ -9,7 +9,7 @@ run: mock-server dev-server
 
 dev-server:
 	@API_URL=http://localhost:3000 ./node_modules/.bin/webpack-dev-server \
-		--content-base examples/list_test --inline --hot --history-api-fallback
+		--content-base examples/blog --inline --hot --history-api-fallback
 
 start-test-server: test-server.PID
 

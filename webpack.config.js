@@ -4,7 +4,7 @@ var path = require('path')
 
 module.exports = {
   devtool: debug ? "inline-sourcemap" : null,
-  entry: "./examples/list_test/js/main.js",
+  entry: "./examples/blog/js/main.js",
   module: {
     loaders: [
       {
