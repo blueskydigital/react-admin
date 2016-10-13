@@ -5,7 +5,7 @@ import IconButton from 'material-ui/IconButton'
 import IconMenu from 'material-ui/IconMenu'
 import MenuItem from 'material-ui/MenuItem'
 
-import TextField from '../../../../src/mui/field/text'
+import TextField from '../../../../src/components/field/text'
 import TextInput from '../../../../src/mui/input/text'
 import ListViewBase from '../../../../src/components/view/list'
 import MUIListView from '../../../../src/mui/view/list'
@@ -20,7 +20,9 @@ export default class PostListView extends ListViewBase {
     const { state } = this.props
     const fields = {
       'id': {title: 'ID', creator: (row) => (<TextField record={row} attr="id" />)},
-      'title': {title: 'Title', creator: (row) => (<TextField record={row} attr="title" maxlen="32" />)},
+      'title': {title: 'Title', creator: (row) => (
+        <TextField record={row} attr="title" to={`posts/${row.id.toString()}`} maxlen={32} />
+      )},
       'category': {title: 'Cat', creator: (row) => (<TextField record={row} attr="category" />)}
     }
     function _deleteRow(row) {
