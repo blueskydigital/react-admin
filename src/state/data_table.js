@@ -107,6 +107,7 @@ export default class DataTableState extends DataManipState {
           this._resetFilters(filters)
           this.totalItems = result.totalItems
           this.items.replace(result.data)
+          this.originEntityId = null
         })
       })
     })
