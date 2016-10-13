@@ -1,5 +1,5 @@
 import React from 'react'
-
+import { Card, CardTitle, CardActions } from 'material-ui/Card'
 import Datagrid from '../datagrid/datagrid'
 import Filters from '../datagrid/filters'
 import Pagination from '../datagrid/pagination'
@@ -16,24 +16,21 @@ export default class MUIListView extends React.Component {
     } = this.props
 
     return (
-      <div className="view list-view">
-        <div className="page-header">
-          <div style={{float: 'right'}}>
-            {actions ? (<DatagridActions state={state} actions={actions} />) : null}
-          </div>
-          <div style={{float: 'right'}}>
-            {filters ? (<Filters.Dropdown state={state} filters={filters} showFilter={onShowFilter} />) : null}
-          </div>
-          <h2>{title}</h2>
-          {desc? <p className="description">{desc}</p> : null}
-          {filters ? (
-            <Filters.Controls state={state} hideFilter={onHideFilter} filters={filters} apply={onFilterApply} />
-          ) : null}
-        </div>
+      <Card style={{ margin: '2em', opacity: state.loading ? 0.8 : 1 }}>
+        <CardActions style={{ zIndex: 2, display: 'inline-block', float: 'right' }}>
+          {actions && (<DatagridActions state={state} actions={actions} />)}
+          {filters && (<Filters.Dropdown state={state} title="addfilter" filters={filters} showFilter={onShowFilter} />)}
+        </CardActions>
+
+        <CardTitle title={title} />
+
+        {filters && (
+          <Filters.Controls state={state} hideFilter={onHideFilter} filters={filters} apply={onFilterApply} />
+        )}
 
         <Datagrid state={state} fields={fields} onSort={onSort} onRowSelection={onRowSelection} />
         <Pagination state={state} onChange={onPageChange} />
-      </div>
+      </Card>
     )
   }
 
