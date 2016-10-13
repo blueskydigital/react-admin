@@ -1,6 +1,6 @@
 
 export function convertQuery(q) {
-  const perPage = q.perPage || 10
+  const perPage = q.perPage
   let converted = {
     _start: (q.page - 1) * perPage,
     _limit: perPage

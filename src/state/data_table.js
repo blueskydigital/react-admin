@@ -97,7 +97,8 @@ export default class DataTableState extends DataManipState {
         page,
         sortField,
         sortDir,
-        filters
+        filters,
+        perPage: this.perPage
       }).then((result) => {
         transaction(() => {
           this.page = page
