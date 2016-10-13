@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react'
-import { Link } from 'react-router'
+import { browserHistory } from 'react-router'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import { Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle } from 'material-ui'
 import CircularProgress from 'material-ui/CircularProgress'
@@ -22,8 +22,8 @@ export default class AppComponent extends React.Component {
           <div>
             <Toolbar>
               <ToolbarGroup firstChild={true}>
-                <FlatButton><Link to="/" >SampleAPp</Link></FlatButton>
-                <FlatButton><Link to="/posts" >Posts</Link></FlatButton>
+                <FlatButton onTouchTap={() => browserHistory.push('/')}>SampleAPp</FlatButton>
+                <FlatButton onTouchTap={() => browserHistory.push('/posts')}>Posts</FlatButton>
               </ToolbarGroup>
               <ToolbarGroup>
                 <Loading state={this.props.state}/>
