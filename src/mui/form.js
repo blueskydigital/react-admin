@@ -3,6 +3,7 @@ import { observer } from 'mobx-react'
 import SaveIcon from 'material-ui/svg-icons/content/save'
 import RaisedButton from 'material-ui/RaisedButton'
 import EditFormBase from '../components/edit/form'
+import { Card, CardTitle, CardActions } from 'material-ui/Card'
 
 @observer
 class SubmitButton extends React.Component {
@@ -29,23 +30,25 @@ class MUIEditForm extends EditFormBase {
   }
 
   render() {
-    const { title, desc, state, saveText } = this.props
+    const { edittitle, createtitle, desc, state, saveText } = this.props
+    const title = state.originEntityId ? edittitle : createtitle
 
     return (
-      <div className="view edit-view">
-        <div className="row">
-          <h2>{title}</h2>
-          {desc ? (<p className="description">{desc}</p>) : null}
-        </div>
-        <div className="row form-horizontal" id="edit-view">
-          <form className="col-lg-12 form-horizontal">
-            {this.buildFields()}
-          </form>
-        </div>
-        <div className="row form-horizontal">
+      <Card style={{ margin: '1em'}}>
+        <CardActions style={{ zIndex: 2, display: 'inline-block', float: 'right' }}>
           <SubmitButton onSubmit={this.save.bind(this)} errors={state.errors} text={saveText} />
-        </div>
-      </div>
+        </CardActions>
+
+        <CardTitle title={title} subtitle={desc} />
+
+        <form style={{ padding: '0 1em 1em 1em' }}>
+          {this.buildFields()}
+        </form>
+
+        <CardActions>
+          <SubmitButton onSubmit={this.save.bind(this)} errors={state.errors} text={saveText} />
+        </CardActions>
+      </Card>
     )
   }
 }

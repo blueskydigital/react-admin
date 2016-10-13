@@ -30,7 +30,8 @@ export default class PostEditView extends EditViewBase {
     }
 
     return (
-      <MUIEditForm fields={fields} state={state} createtitle='create post' saveText="SAVE" />
+      <MUIEditForm fields={fields} state={state} createtitle='create new post'
+        edittitle='edit post' saveText="SAVE" />
     )
   }
 }
