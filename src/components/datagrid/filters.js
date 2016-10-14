@@ -34,8 +34,7 @@ class ControlsBase extends React.Component {
   static propTypes = {
     filters: React.PropTypes.object.isRequired,
     state: React.PropTypes.object.isRequired,
-    hideFilter: React.PropTypes.func.isRequired,
-    apply: React.PropTypes.func.isRequired
+    hideFilter: React.PropTypes.func.isRequired
   }
 
   buildRows(filters, state) {

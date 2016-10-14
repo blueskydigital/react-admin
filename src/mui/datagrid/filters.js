@@ -4,6 +4,7 @@ import ContentFilter from 'material-ui/svg-icons/content/filter-list'
 import IconMenu from 'material-ui/IconMenu'
 import MenuItem from 'material-ui/MenuItem'
 import IconButton from 'material-ui/IconButton'
+import RaisedButton from 'material-ui/RaisedButton'
 import FilterBases from '../../components/datagrid/filters'
 
 // dropdown with available filters
@@ -50,11 +51,20 @@ class Controls extends FilterBases.ControlsBase {
         <div>
           {controls}
         </div>
-        <button onClick={apply}>apply</button>
+
       </div>
     )
   }
 
 }
 
-export default { Dropdown, Controls }
+@observer
+class Apply extends React.Component {
+  render() {
+    const { apply, label, state } = this.props
+    const show = state.filters.size > 0
+    return show && (<RaisedButton label={label} icon={<ContentFilter />} onTouchTap={apply}/>)
+  }
+}
+
+export default { Dropdown, Controls, Apply }
