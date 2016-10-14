@@ -48,10 +48,9 @@ class Controls extends FilterBases.ControlsBase {
   renderControls(controls, apply) {
     return (
       <div className="filters form-horizontal">
-        <div>
+        <form style={{ padding: '0 1em 1em 1em' }}>
           {controls}
-        </div>
-
+        </form>
       </div>
     )
   }
