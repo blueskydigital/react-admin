@@ -24,8 +24,13 @@ export default class BaseState {
 
   callRequester(fn) {
     this.req.count++
-    return fn().then(() => {
+    return fn()
+    .then(() => {
       this.req.count--
+    })
+    .catch((err) => {
+      this.req.count--
+      alert(err)
     })
   }
 
