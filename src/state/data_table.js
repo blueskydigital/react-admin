@@ -7,8 +7,8 @@ export default class DataTableState extends DataManipState {
 
   @observable entityName = null
   @observable items = []
-  @observable totalItems = 0
-  @observable page = 1
+  @observable totalItems:number = 0
+  @observable page:number = 1
   @observable sortDir = null
   @observable sortField = null
 
@@ -20,12 +20,12 @@ export default class DataTableState extends DataManipState {
 
   @action
   updatePage(page) {
-    this._getEntries(this.entityName, page, this.sortField, this.sortDir, toJS(this.filters))
+    this._getEntries(this.entityName, page)
   }
 
   @action
   updateSort(sortField, sortDir) {
-    this._getEntries(this.entityName, this.page, sortField, sortDir, toJS(this.filters))
+    this._getEntries(this.entityName, undefined, sortField, sortDir)
   }
 
   @action
@@ -69,7 +69,7 @@ export default class DataTableState extends DataManipState {
 
   @action
   applyFilters() {
-    this._getEntries(this.entityName, this.page, this.sortField, this.sortDir, this.filters)
+    this._getEntries(this.entityName, undefined, undefined, undefined, toJS(this.filters))
   }
 
   @action
@@ -97,17 +97,17 @@ export default class DataTableState extends DataManipState {
         page,
         sortField,
         sortDir,
-        filters,
+        filters: filters || toJS(this.filters),
         perPage: this.perPage
       }).then((result) => {
         transaction(() => {
-          this.page = page
-          this.sortField = sortField
-          this.sortDir = sortDir
-          this._resetFilters(filters)
+          page && (this.page = page)
+          sortField && (this.sortField = sortField)
+          sortDir && (this.sortDir = sortDir)
+          filters && this._resetFilters(filters)
           this.totalItems = result.totalItems
           this.items.replace(result.data)
-          this.originEntityId = null
+          this.originEntityId && (this.originEntityId = null)
         })
       })
     })
