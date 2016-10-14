@@ -3,15 +3,6 @@ import React from 'react'
 
 export default class EditFormBase extends React.Component {
 
-  save(e) {
-    e.preventDefault()
-    this.props.state.saveData(this.props.entityName).then(this.onUpdated.bind(this))
-  }
-
-  onUpdated() {
-    alert('Changes successfully saved.')
-  }
-
   updateField(name, value) {
     const validators = this.props.fields[name].validators
     this.props.state.updateData(name, value, validators)
@@ -29,6 +20,35 @@ export default class EditFormBase extends React.Component {
       )
     }
     return inputs
+  }
+
+  onUpdated() {
+    alert('Changes successfully saved.')
+  }
+
+  onSave(e) {
+    e.preventDefault()
+    this.props.saveData().then(this.onUpdated.bind(this))
+  }
+
+  onSaveAndReturn2list(e) {
+    e.preventDefault()
+    this.props.saveData().then(this.onUpdated.bind(this))
+    .then(() => {
+      this.props.return2List()
+    })
+  }
+
+  onCancel(e) {
+    e.preventDefault()
+    this.props.return2List()
+  }
+
+  static propTypes = {
+    fields: React.PropTypes.object.isRequired,
+    state: React.PropTypes.object.isRequired,
+    saveData: React.PropTypes.func.isRequired,
+    return2List: React.PropTypes.func.isRequired
   }
 
 }

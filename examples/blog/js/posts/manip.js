@@ -31,7 +31,9 @@ export default class PostEditView extends EditViewBase {
 
     return (
       <MUIEditForm fields={fields} state={state} createtitle='create new post'
-        edittitle='edit post' saveText="SAVE" />
+        edittitle='edit post' saveText="SAVE"
+        saveData={this.save.bind(this)}
+        return2List={this.return2List.bind(this)} />
     )
   }
 }

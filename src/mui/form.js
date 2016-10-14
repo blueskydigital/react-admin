@@ -30,13 +30,14 @@ class MUIEditForm extends EditFormBase {
   }
 
   render() {
-    const { edittitle, createtitle, desc, state, saveText } = this.props
+    const { edittitle, createtitle, desc, state, saveText, onSaveData, saveAndReturnText } = this.props
+
     const title = state.originEntityId ? edittitle : createtitle
 
     return (
       <Card style={{ margin: '1em'}}>
         <CardActions style={{ zIndex: 2, display: 'inline-block', float: 'right' }}>
-          <SubmitButton onSubmit={this.save.bind(this)} errors={state.errors} text={saveText} />
+          <SubmitButton onSubmit={this.onSave.bind(this)} errors={state.errors} text={saveText} />
         </CardActions>
 
         <CardTitle title={title} subtitle={desc} />
@@ -46,7 +47,9 @@ class MUIEditForm extends EditFormBase {
         </form>
 
         <CardActions>
-          <SubmitButton onSubmit={this.save.bind(this)} errors={state.errors} text={saveText} />
+          <SubmitButton onSubmit={this.onSave.bind(this)} errors={state.errors} text={saveText} />
+          <SubmitButton onSubmit={this.onSaveAndReturn2list.bind(this)} errors={state.errors} text={saveAndReturnText || 'save and return'} />
+          <RaisedButton label={'cancel'} icon={<SaveIcon />} onTouchTap={this.onCancel.bind(this)}/>
         </CardActions>
       </Card>
     )

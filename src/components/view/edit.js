@@ -1,5 +1,5 @@
 import React from 'react'
-
+import { browserHistory } from 'react-router'
 
 export default class EditView extends React.Component {
 
@@ -21,6 +21,14 @@ export default class EditView extends React.Component {
     if (nextProps.params.id !== this.props.params.id) {
       this.props.state.loadEditData(nextProps.params.entity, nextProps.params.id)
     }
+  }
+
+  save() {
+    return this.props.state.saveData(this.props.entityName)
+  }
+
+  return2List() {
+    browserHistory.push(`/${this.props.entityName}/`)
   }
 
 }

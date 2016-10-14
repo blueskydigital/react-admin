@@ -21,7 +21,7 @@ export default class PostListView extends ListViewBase {
     const fields = {
       'id': {title: 'ID', creator: (row) => (<TextField record={row} attr="id" />)},
       'title': {title: 'Title', creator: (row) => (
-        <TextField record={row} attr="title" to={`posts/${row.id.toString()}`} maxlen={32} />
+        <TextField record={row} attr="title" to={`/posts/${row.id.toString()}`} maxlen={32} />
       )},
       'category': {title: 'Cat', creator: (row) => (<TextField record={row} attr="category" />)}
     }
