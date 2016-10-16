@@ -5,6 +5,8 @@ import IconMenu from 'material-ui/IconMenu'
 import MenuItem from 'material-ui/MenuItem'
 import IconButton from 'material-ui/IconButton'
 import RaisedButton from 'material-ui/RaisedButton'
+import { CardText } from 'material-ui/Card'
+import ActionHide from 'material-ui/svg-icons/action/highlight-off'
 import FilterBases from '../../components/datagrid/filters'
 
 // dropdown with available filters
@@ -34,24 +36,29 @@ class Controls extends FilterBases.ControlsBase {
   renderControl(filter, name, state, onHide, onUpdateValue) {
 
     const deleteLink = (
-      <a className="remove" onClick={onHide}>rem</a>
+      <IconButton iconStyle={{ color: '#00bcd4' }} onTouchTap={onHide} tooltip="Remove this filter">
+        <ActionHide />
+      </IconButton>
     )
 
     return (
       <div className={`form-field form-group filter-${name}`} key={name}>
-        <span className="col-sm-1 col-xs-1">{deleteLink}</span>
-        <filter.component record={state.filters} attr={name} label={filter.label} onChange={onUpdateValue} />
+        <div style={{ float: 'left' }}>
+          {deleteLink}
+        </div>
+        <div style={{ float: 'right' }}>
+          <filter.component record={state.filters} attr={name} label={filter.label} onChange={onUpdateValue} />
+        </div>
       </div>
     )
   }
 
   renderControls(controls, apply) {
     return (
-      <div className="filters form-horizontal">
-        <form style={{ padding: '0 1em 1em 1em' }}>
-          {controls}
-        </form>
-      </div>
+      <CardText>
+        {controls}
+        <div style={{ clear: 'both' }}></div>
+      </CardText>
     )
   }
 
