@@ -10,7 +10,7 @@ injectTapEventPlugin()
 // create requester
 import { convertQuery, getTotalItems } from './api_flavor'
 import DataRequester from '../../../src/services/requester'
-const _requester = new DataRequester(convertQuery, getTotalItems)
+const _requester = new DataRequester(convertQuery, getTotalItems, Conf.apiUrl)
 
 // use it to create the app state
 import StateStore from './stateStore'
