@@ -9,6 +9,7 @@ export default class DatagridBase extends React.Component {
   static propTypes = {
     fields: React.PropTypes.object.isRequired,
     state: React.PropTypes.object.isRequired,
+    rowId: React.PropTypes.func.isRequired, // func that returns unique ID from given row
     onSort: React.PropTypes.func,
     listActions: React.PropTypes.func
   }
@@ -30,9 +31,9 @@ export default class DatagridBase extends React.Component {
     return headers
   }
 
-  buildCells(row, idAttr='id') {
+  buildCells(row, rowId) {
     let cells = _.map(this.props.fields, (val, name) => {
-      return this.renderCell(row, name, val.creator, idAttr)
+      return this.renderCell(row, name, val.creator, rowId)
     })
 
     if (this.props.listActions) {
@@ -42,23 +43,4 @@ export default class DatagridBase extends React.Component {
     return cells
   }
 
-  render() {
-    const { items } = this.props.state
-    const selectable = this.props.onRowSelection !== undefined
-
-    if(items.length === 0) {
-      return null
-    }
-
-    return (
-      <Table selectable={selectable} onRowSelection={this.props.onRowSelection} multiSelectable={true}>
-        <TableHeader>
-          <TableRow>{this.buildHeaders()}</TableRow>
-        </TableHeader>
-        <TableBody displayRowCheckbox={selectable} deselectOnClickaway={false}>
-          {items.map((r, i) => (<TableRow key={i}>{this.buildCells(r)}</TableRow>))}
-        </TableBody>
-      </Table>
-    )
-  }
 }

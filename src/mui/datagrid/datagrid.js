@@ -16,9 +16,9 @@ class MUIDatagrid extends DatagridBase {
     )
   }
 
-  renderCell(row, name, creatorFn, idAttr='id') {
+  renderCell(row, name, creatorFn, rowId) {
     return (
-      <TableRowColumn key={`td_${row[idAttr]}_${name}`}>
+      <TableRowColumn key={`td_${rowId}_${name}`}>
         {creatorFn(row)}
       </TableRowColumn>
     )
@@ -31,10 +31,10 @@ class MUIDatagrid extends DatagridBase {
   }
 
   render() {
-    const { items } = this.props.state
+    const { rowId, state } = this.props
     const selectable = this.props.onRowSelection !== undefined
 
-    if(items.length === 0) {
+    if(state.items.length === 0) {
       return null
     }
 
@@ -44,7 +44,11 @@ class MUIDatagrid extends DatagridBase {
           <TableRow>{this.buildHeaders()}</TableRow>
         </TableHeader>
         <TableBody displayRowCheckbox={selectable} deselectOnClickaway={false}>
-          {items.map((r, i) => (<TableRow key={i}>{this.buildCells(r)}</TableRow>))}
+          {state.items.map((r, i) => {
+            const id = rowId(r)
+            const selected = state.selection.indexOf(i) >= 0
+            return (<TableRow selected={selected} key={i}>{this.buildCells(r, id)}</TableRow>)
+          })}
         </TableBody>
       </Table>
     )

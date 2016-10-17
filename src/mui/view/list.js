@@ -11,7 +11,7 @@ export default class MUIListView extends React.Component {
   render() {
     const {
       state, title, desc, fields, actions,
-      onSort, onPageChange, onRowSelection,
+      rowId, onSort, onPageChange, onRowSelection,
       filters, onShowFilter, onHideFilter, onFilterApply // optional props
     } = this.props
 
@@ -29,7 +29,7 @@ export default class MUIListView extends React.Component {
           <Filters.Controls state={state} hideFilter={onHideFilter} filters={filters} />
         )}
 
-        <Datagrid state={state} fields={fields} onSort={onSort} onRowSelection={onRowSelection} />
+        <Datagrid state={state} fields={fields} rowId={rowId} onSort={onSort} onRowSelection={onRowSelection} />
         <Pagination state={state} onChange={onPageChange} />
       </Card>
     )
@@ -38,6 +38,7 @@ export default class MUIListView extends React.Component {
   static propTypes = {
     fields: React.PropTypes.object.isRequired,
     state: React.PropTypes.object.isRequired,
+    rowId: React.PropTypes.func.isRequired,
     listActions: React.PropTypes.func,
     onSort: React.PropTypes.func.isRequired,
     onPageChange: React.PropTypes.func.isRequired,
