@@ -15,9 +15,8 @@ export default class DataManipState extends BaseState {
     return this.callRequester(() => {
       return this.requester.getEntry(entityName, id).then((result) => {
         transaction(() => {
-          // this.entity.clear()
-          // this.entity.merge(result.data)
-          this.entity = result.data
+          this.entity.clear()
+          this.entity.merge(result.data)
         })
       })
     })
@@ -52,7 +51,7 @@ export default class DataManipState extends BaseState {
   @action
   updateData(fieldName, value, validators) {
     transaction(() => {
-      this.entity[fieldName] = value
+      this.entity.set(fieldName, value)
       if(validators) {
         this._validateField(fieldName, value, validators)
       }

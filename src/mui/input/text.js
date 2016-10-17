@@ -20,9 +20,10 @@ class TextInput extends React.Component {
   render() {
     const { attr, label, record, errors } = this.props
     const errorText = errors ? errors.get(attr) : undefined
+    const value = record.get(attr)
     return (
       <TextField name={attr} floatingLabelText={label}
-        value={record[attr] || ''} onChange={this.handleChange}
+        value={value || ''} onChange={this.handleChange}
         errorText={errorText} fullWidth={true} />
     )
   }
