@@ -3,20 +3,19 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "start": "webpack-dev-server --content-base examples/list_test --inline --hot"
-  },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "admin",
+    "mobx",
+    "rest"
+  ],
+  "author": "vencax <vencax77@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.14.0",
     "material-ui": "^0.16.0",
     "mobx": "^2.3.7",
     "mobx-react": "^3.5.1",
-    "react": "^15.2.1",
-    "react-dom": "^15.3.0",
-    "react-tap-event-plugin": "^1.0.0"
+    "react": "^15.2.1"
   },
   "devDependencies": {
     "babel-core": "^6.17.0",
@@ -28,7 +27,7 @@
     "json-server": "^0.8.22",
     "mobx-react-devtools": "^4.2.6",
     "react-addons-test-utils": "^15.3.0",
-    "webpack": "^1.13.1",
+    "webpack": "^1.13.2",
     "webpack-dev-server": "^1.14.1"
   }
 }

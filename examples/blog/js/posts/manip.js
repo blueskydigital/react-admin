@@ -1,8 +1,8 @@
 import React from 'react'
 
-import TextInput from '../../../../src/mui/input/text'
-import EditViewBase from '../../../../src/components/view/edit'
-import MUIEditForm from '../../../../src/mui/form'
+import TextInput from 'react-mobx-admin/mui/input/text'
+import EditViewBase from 'react-mobx-admin/components/view/edit'
+import MUIEditForm from 'react-mobx-admin/mui/form'
 
 
 export default class PostEditView extends EditViewBase {

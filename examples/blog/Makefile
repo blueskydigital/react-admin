@@ -1,23 +1,10 @@
-.PHONY: build
+.PHONY: run
 
-install:
-	@mkdir -p build
-	npm install
+run: mock-server dev-server
 
-build: clean
-	@cp ../../build/* ./build
-	@NODE_ENV=production ./node_modules/.bin/webpack --progress --debug
-	@echo "File build/app.js updated"
+dev-server:
+	@API_URL=http://localhost:3000 ../../node_modules/.bin/webpack-dev-server \
+		--content-base . --inline --hot --history-api-fallback
 
-build-debug: clean
-	@cp ../../build/* ./build
-	./node_modules/.bin/webpack -d --progress --debug --colors
-	@echo "File build/app.js debug updated"
-
-run:
-	./node_modules/.bin/webpack-dev-server --colors \
-		--inline --devtool cheap-module-inline-source-map --hot \
-		--content-base .
-
-clean:
-	@rm -rf ./build/*
+mock-server:
+	@node ../../fake_backend/index.js &

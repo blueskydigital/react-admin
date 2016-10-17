@@ -1,46 +1,31 @@
-var path = require('path');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var debug = process.env.NODE_ENV !== "production"
+var webpack = require('webpack')
+var path = require('path')
 
 module.exports = {
-  entry: {
-    main: "./js/main.js",
-    style: "./styles/main.scss"
-  },
-  output: {
-    // path: __dirname + '/build',
-    filename: '[name].js'
-  },
-  externals: {
-    "moment": "moment"
-  },
+  devtool: debug ? "inline-sourcemap" : null,
+  entry: "./js/main.js",
   module: {
     loaders: [
       {
-        test: /\.jsx?$/,
-        loader: 'babel?presets[]=es2015&presets[]=react',
-        exclude: [
-          /node_modules\/immutable/,
-          /node_modules\/moment/,
-          /node_modules\/esprima-fb/,
-          /node_modules\/jsx-transform/,
-          /node_modules\/codemirror/,
-          /node_modules\/medium-editor/,
-        ]
-        // include: [
-        //   path.resolve(__dirname, "js")
-        // ]
-      },
-      { test: /\.css$/, loader: ExtractTextPlugin.extract('css') },
-      { test: /\.scss$/, loader: ExtractTextPlugin.extract('css!sass') },
-      { test: /\.woff$/, loader: "url-loader?limit=10000&mimetype=application/font-woff&name=[path][name].[ext]"},
-      { test: /\.woff2$/, loader: "url-loader?limit=10000&mimetype=application/font-woff2&name=[path][name].[ext]"},
-      { test: /\.(eot|ttf|svg|gif|png)$/, loader: "file-loader" }
+        test: /\.js$/,
+        exclude: /(node_modules)/,
+        loader: 'babel-loader',
+      }
     ]
   },
-  plugins: [
-    new ExtractTextPlugin('styles.css', { allChunks: true }),
+  output: {
+    path: path.join(__dirname, "examples/list_test"),
+    filename: "main.min.js"
+  },
+  plugins: debug ? [] : [
+    new webpack.optimize.DedupePlugin(),
+    new webpack.optimize.OccurenceOrderPlugin(),
+    new webpack.optimize.UglifyJsPlugin({ mangle: false, sourcemap: false }),
   ],
-  node: {
-    fs: 'empty'
+  resolve: {
+    alias: {
+      'react-mobx-admin': path.join(__dirname, '../..', 'src'),
+    },
   }
-};
+}

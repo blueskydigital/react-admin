@@ -1,5 +1,5 @@
 import {observable, computed, toJS, action, transaction} from 'mobx'
-import DataTableState from '../../../src/state/data_table'
+import DataTableState from 'react-mobx-admin/state/data_table'
 
 
 export default class StateStore extends DataTableState {

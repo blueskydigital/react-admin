@@ -5,11 +5,11 @@ import IconButton from 'material-ui/IconButton'
 import IconMenu from 'material-ui/IconMenu'
 import MenuItem from 'material-ui/MenuItem'
 
-import TextField from '../../../../src/components/field/text'
-import DateField from '../../../../src/components/field/date'
-import TextInput from '../../../../src/mui/input/text'
-import ListViewBase from '../../../../src/components/view/list'
-import MUIListView from '../../../../src/mui/view/list'
+import TextField from 'react-mobx-admin/components/field/text'
+import DateField from 'react-mobx-admin/components/field/date'
+import TextInput from 'react-mobx-admin/mui/input/text'
+import ListViewBase from 'react-mobx-admin/components/view/list'
+import MUIListView from 'react-mobx-admin/mui/view/list'
 
 export default class PostListView extends ListViewBase {
 
