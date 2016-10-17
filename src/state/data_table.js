@@ -48,7 +48,7 @@ export default class DataTableState extends DataManipState {
 
   @action
   updateSelection(data) {
-    this.selection.replace(data)
+    this.selection = data
   }
 
   // ---------------------- filtration  ----------------------------
