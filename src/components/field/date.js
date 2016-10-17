@@ -1,12 +1,10 @@
-import React, { PropTypes } from 'react'
+import FieldBase from './base'
 
-const TextField = ({ attr, record = {} }) => (
-  <span>{record[source] instanceof Date ? record[source].toLocaleDateString() : (new Date(record[source])).toLocaleDateString()}</span>
-)
+export default class TextField extends FieldBase {
 
-TextField.propTypes = {
-    attr: PropTypes.string.isRequired,
-    record: PropTypes.object.isRequired
+  getVal(record, attr) {
+    const d = record[attr] instanceof Date ? d : new Date(record[attr])
+    return d.toLocaleDateString()
+  }
+
 }
-
-export default TextField
