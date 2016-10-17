@@ -2,16 +2,24 @@ import axios from 'axios'
 
 class DataRequester {
 
-  constructor(convertQuery, getTotalItems) {
+  constructor(convertQuery, getTotalItems, apiUrl) {
+    this.apiUrl = apiUrl
     this.convertQuery = convertQuery
     this.getTotalItems = getTotalItems
+  }
+
+  setDefaultHeaders(defHeaders) {
+    let key
+    for(key in defHeaders) {
+      axios.defaults.headers.common[key] = defHeaders[key]
+    }
   }
 
   getEntries(entityName, params) {
 
     let qParams = this.convertQuery(params)
 
-    return axios.get(`${Conf.apiUrl}/${entityName}`, {params: qParams}).then((response) => {
+    return axios.get(`${this.apiUrl}/${entityName}`, {params: qParams}).then((response) => {
       return {
         data: response.data,
         totalItems: this.getTotalItems(response)
@@ -22,7 +30,7 @@ class DataRequester {
 
   getEntry(entityName, id, options={}) {
 
-    return axios.get(`${Conf.apiUrl}/${entityName}/${id}`)
+    return axios.get(`${this.apiUrl}/${entityName}/${id}`)
 
   }
 
@@ -30,9 +38,9 @@ class DataRequester {
     let query
 
     if (id) {
-      query = axios.put(`${Conf.apiUrl}/${entityName}/${id}`, data)
+      query = axios.put(`${this.apiUrl}/${entityName}/${id}`, data)
     } else {
-      query = axios.post(`${Conf.apiUrl}/${entityName}`, data)
+      query = axios.post(`${this.apiUrl}/${entityName}`, data)
     }
 
     return query.then((response) => {

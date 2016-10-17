@@ -30,7 +30,13 @@ export default class BaseState {
     })
     .catch((err) => {
       this.req.count--
-      alert(err)
+      if(err.response && err.response.status === 401) {
+        this.on401(err)
+      } else if (err.response) {
+        this.onApiErr(err)
+      } else {
+        throw err
+      }
     })
   }
 
