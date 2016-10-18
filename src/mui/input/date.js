@@ -10,11 +10,13 @@ class TextInput extends React.Component {
     record: React.PropTypes.object.isRequired,
     label: React.PropTypes.string,
     onChange: React.PropTypes.func.isRequired,
-    errors: React.PropTypes.object
+    errors: React.PropTypes.object,
+    validators: React.PropTypes.array
   }
 
   handleChange = (_, value) => {
-    this.props.onChange(this.props.attr, value)
+    const { attr, validators } = this.props
+    this.props.onChange(attr, value, validators)
   }
 
   datify(value) {

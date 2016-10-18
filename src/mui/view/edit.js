@@ -2,7 +2,7 @@ import React from 'react'
 import { observer } from 'mobx-react'
 import SaveIcon from 'material-ui/svg-icons/content/save'
 import RaisedButton from 'material-ui/RaisedButton'
-import EditFormBase from '../components/edit/form'
+import EditFormBase from '../../components/edit/form'
 import { Card, CardTitle, CardActions } from 'material-ui/Card'
 
 @observer
@@ -21,14 +21,6 @@ class SubmitButton extends React.Component {
 @observer
 class MUIEditForm extends EditFormBase {
 
-  buildField(name, CustomComponent, record, errors, onChange) {
-    return (
-      <div key={`fld_${name}`}>
-        <CustomComponent attr={name} record={record} errors={errors} onChange={onChange} />
-      </div>
-    )
-  }
-
   render() {
     const { edittitle, createtitle, desc, state, saveText, onSaveData, saveAndReturnText } = this.props
 
@@ -43,7 +35,7 @@ class MUIEditForm extends EditFormBase {
         <CardTitle title={title} subtitle={desc} />
 
         <form style={{ padding: '0 1em 1em 1em' }}>
-          {this.buildFields()}
+          {<this.props.formcomponent onChange={this.updateField.bind(this)} state={state} />}
         </form>
 
         <CardActions>
