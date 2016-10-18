@@ -16,6 +16,8 @@ class Loading extends React.Component {
 
 export default class AppComponent extends React.Component {
   render() {
+    const { state } = this.props
+
     return (
       <div>
         <MuiThemeProvider className="view-wrapper">
@@ -24,6 +26,7 @@ export default class AppComponent extends React.Component {
               <ToolbarGroup firstChild={true}>
                 <FlatButton onTouchTap={() => browserHistory.push('/')}>SampleAPp</FlatButton>
                 <FlatButton onTouchTap={() => browserHistory.push('/posts')}>Posts</FlatButton>
+                <FlatButton onTouchTap={() => state.changeLang()}>ChangeLang</FlatButton>
               </ToolbarGroup>
               <ToolbarGroup>
                 <Loading state={this.props.state}/>
