@@ -19,14 +19,21 @@ export default class PostListView extends ListViewBase {
 
   render() {
     const { state } = this.props
-    const fields = {
-      'id': {title: 'ID', creator: (row) => (<TextField record={row} attr="id" />)},
-      'title': {title: 'Title', creator: (row) => {
-        return (<TextField record={row} attr="title" maxlen={32} to={`/posts/${row.id.toString()}`}/>)
-      }},
-      'category': {title: 'Cat', creator: (row) => (<TextField record={row} attr="category" />)},
-      'published_at': {title: 'Published', creator: (row) => (<DateField record={row} attr="published_at" />)}
-    }
+    const titles = [
+      'ID', 'Title', 'Cat', 'Published'
+    ]
+    const attrs = [
+      "id", "title", "category", "published_at"
+    ]
+    const fields = [
+      (attr, row) => (<TextField attr={attr} record={row} />),
+      (attr, row) => {
+        const to = `/posts/${row.id.toString()}`
+        return (<TextField attr={attr} record={row} maxlen={32} to={to}/>)
+      },
+      (attr, row) => (<TextField attr={attr} record={row} />),
+      (attr, row) => (<DateField attr={attr} record={row} />)
+    ]
     function rowId(row) {
       return row.id
     }
@@ -59,7 +66,7 @@ export default class PostListView extends ListViewBase {
     }
 
     return (
-      <MUIListView state={state} fields={fields} title='posts'
+      <MUIListView state={state} attrs={attrs} headertitles={titles} fields={fields} title='posts'
         listActions={listActions} actions={batchActions} filters={filters}
         rowId={rowId}
         onSort={this.onListSort.bind(this)}

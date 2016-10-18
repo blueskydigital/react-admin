@@ -10,10 +10,14 @@ export default class MUIListView extends React.Component {
 
   render() {
     const {
-      state, title, desc, fields, actions,
+      state, title, desc, attrs, headertitles, fields, actions,
       rowId, onSort, onPageChange, onRowSelection,
       filters, onShowFilter, onHideFilter, onFilterApply // optional props
     } = this.props
+
+    function isSelected(idx) {
+      return state.selection.indexOf(idx) >= 0
+    }
 
     return (
       <Card style={{ margin: '2em', opacity: state.loading ? 0.8 : 1 }}>
@@ -29,14 +33,18 @@ export default class MUIListView extends React.Component {
           <Filters.Controls state={state} hideFilter={onHideFilter} filters={filters} />
         )}
 
-        <Datagrid state={state} fields={fields} rowId={rowId} onSort={onSort} onRowSelection={onRowSelection} />
+        <Datagrid items={state.items} attrs={attrs} titles={headertitles} fields={fields} rowId={rowId}
+          onSort={onSort} sortstate={state}
+          onRowSelection={onRowSelection} isSelected={isSelected} />
         <Pagination state={state} onChange={onPageChange} />
       </Card>
     )
   }
 
   static propTypes = {
-    fields: React.PropTypes.object.isRequired,
+    attrs: React.PropTypes.array.isRequired,
+    fields: React.PropTypes.array.isRequired,
+    headertitles: React.PropTypes.array,
     state: React.PropTypes.object.isRequired,
     rowId: React.PropTypes.func.isRequired,
     listActions: React.PropTypes.func,

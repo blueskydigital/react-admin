@@ -17,11 +17,11 @@ class ColumnHeader extends React.Component {
     if (onSort) {
       let sortIcon = null
       if (sort) {
-          sortIcon = <span className={`sorted sorted-${sort.toLowerCase()}`}></span>
+          sortIcon = this.renderIcon(sort)
       }
       const sortDir = 'ASC' === sort ? 'DESC' : 'ASC'
 
-      element = <a onClick={this.onSort(sortDir)}>{sortIcon}{label}</a>
+      element = <a onClick={this.onSort(sortDir)}>{label}{sortIcon}</a>
     }
 
     return element
