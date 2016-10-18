@@ -6,4 +6,4 @@ build/*.ttf
 build/*.eot
 build/*.woff
 examples/blog/build/*
-jest.lastrun
+lib/

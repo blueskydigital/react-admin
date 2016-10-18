@@ -1,6 +1,7 @@
 import React from 'react'
 
 import TextInput from 'react-mobx-admin/mui/input/text'
+import DateInput from 'react-mobx-admin/mui/input/date'
 import EditViewBase from 'react-mobx-admin/components/view/edit'
 import MUIEditForm from 'react-mobx-admin/mui/form'
 
@@ -26,6 +27,9 @@ export default class PostEditView extends EditViewBase {
       },
       'category': {
         component: (props) => (<TextInput label={'Category'} {...props} />)
+      },
+      'published_at': {
+        component: (props) => (<DateInput label={'Published'} {...props} />)
       }
     }
 
