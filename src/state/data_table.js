@@ -15,12 +15,12 @@ export default class DataTableState extends DataManipState {
   @action
   loadListData(entityName, page = 1, sortField = null, sortDir = null, filters = {}) {
     this.entityName = entityName
-    this._getEntries(entityName, page, sortField, sortDir, filters)
+    this._getEntries(entityName, parseInt(page), sortField, sortDir, filters)
   }
 
   @action
   updatePage(page) {
-    this._getEntries(this.entityName, page)
+    this._getEntries(this.entityName, parseInt(page))
   }
 
   @action
@@ -94,9 +94,9 @@ export default class DataTableState extends DataManipState {
   _getEntries(entityName, page, sortField, sortDir, filters) {
     return this.callRequester(() => {
       return this.requester.getEntries(entityName, {
-        page,
-        sortField,
-        sortDir,
+        page: page || this.page,
+        sortField: sortField || this.sortField,
+        sortDir: sortDir || this.sortDir,
         filters: filters || toJS(this.filters),
         perPage: this.perPage
       }).then((result) => {
