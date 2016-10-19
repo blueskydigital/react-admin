@@ -1,7 +1,7 @@
 {
   "name": "react-mobx-admin",
   "version": "1.0.0",
-  "description": "",
+  "description": "unopinionated framework for React based admin applications",
   "main": "index.js",
   "keywords": [
     "admin",
@@ -9,8 +9,9 @@
     "rest"
   ],
   "author": "vencax <vencax77@gmail.com>",
+  "repository": "https://github.com/blueskydigital/react-admin",
   "license": "ISC",
-  "dependencies": {
+  "peerDependencies": {
     "axios": "^0.14.0",
     "material-ui": "^0.16.0",
     "mobx": "^2.3.7",
