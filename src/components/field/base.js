@@ -19,7 +19,7 @@ export default class FieldBase extends React.Component {
   render() {
     const { attr, record, maxlen, to } = this.props
     let val = this.getVal(record, attr)
-    val = maxlen ? (val.substring(0, maxlen) + ' ...') : val
+    val = (maxlen && typeof val === 'string' && val.length > maxlen) ? (val.substring(0, maxlen) + ' ...') : val
     return to ? (<a href="#" onTouchTap={this.handleTouchTap.bind(this)}>{val}</a>) : (<span>{val}</span>)
   }
 
