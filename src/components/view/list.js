@@ -18,25 +18,6 @@ export default class ListViewBase extends React.Component {
     state.loadListData(entityName, perPage || 10, page, sortField, sortDir, filterVals)
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { state, location } = this.props
-    const { page, sortField, sortDir, filters } = location.query
-
-    if(nextProps.location.query.page !== page) {
-      state.updatePage(nextProps.location.query.page)
-    } else if(nextProps.location.query.sortField !== sortField || nextProps.location.query.sortDir !== sortDir) {
-      state.updateSort(nextProps.location.query.sortField, nextProps.location.query.sortDir)
-    } else if(nextProps.location.query.filters !== filters) {
-      const newFilters = nextProps.location.query.filters
-      try {
-        const filterVals = newFilters ? JSON.parse(newFilters) : {}
-        state.resetFilters(filterVals)
-      } catch(err) {
-
-      }
-    }
-  }
-
   showFilter(filter) {
     this.props.state.showFilter(filter)
     this._setFilterQuery()
@@ -62,6 +43,7 @@ export default class ListViewBase extends React.Component {
   }
 
   onListSort(field, dir) {
+    this.props.state.updateSort(field, dir)
     this._changeQuery({sortDir: dir, sortField: field})
   }
 
@@ -86,6 +68,7 @@ export default class ListViewBase extends React.Component {
   }
 
   onPageChange(page) {
+    this.props.state.updatePage(page)
     this._changeQuery({page: page})
   }
 
