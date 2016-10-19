@@ -14,7 +14,8 @@ import MUIListView from 'react-mobx-admin/mui/view/list'
 export default class PostListView extends ListViewBase {
 
   static defaultProps = {
-    entityName: 'posts'
+    entityName: 'posts',
+    perPage: 5
   }
 
   render() {

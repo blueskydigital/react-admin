@@ -4,8 +4,8 @@ import DataManipState from './data_manip'
 export default class DataTableState extends DataManipState {
 
   perPage = 2
+  entityName = null
 
-  @observable entityName = null
   @observable items = []
   @observable totalItems:number = 0
   @observable page:number = 1
@@ -13,8 +13,16 @@ export default class DataTableState extends DataManipState {
   @observable sortField = null
 
   @action
-  loadListData(entityName, page = 1, sortField = null, sortDir = null, filters = {}) {
+  loadListData(entityName, perPage, page = 1, sortField = null, sortDir = null, filters = {}) {
     this.entityName = entityName
+    this.perPage = perPage
+    transaction(() => {
+      this.page = page
+      this.sortField = sortField
+      this.sortDir = sortDir
+      this._resetFilters()
+      this.items.replace([])
+    })
     this._getEntries(entityName, parseInt(page), sortField, sortDir, filters)
   }
 
