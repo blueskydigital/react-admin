@@ -25,7 +25,7 @@ module.exports = {
   ],
   resolve: {
     alias: {
-      'react-mobx-admin': path.join(__dirname, '../..', 'src'),
+      'react-mobx-admin': path.join(__dirname, '../..'),
     },
   }
 }
