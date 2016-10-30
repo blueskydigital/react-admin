@@ -1,12 +1,10 @@
-.PHONY: build
+.PHONY: run
 
-install:
-	npm install
-	bower install
+run: mock-server dev-server
 
-build:
-	@NODE_ENV=production ./node_modules/webpack/bin/webpack.js --progress
-	@echo "File build/app.js updated"
+dev-server:
+	@API_URL=http://localhost:3000 ../../node_modules/.bin/webpack-dev-server \
+		--content-base . --inline --hot --history-api-fallback
 
-run:
-	./node_modules/webpack-dev-server/bin/webpack-dev-server.js --port 8088 --progress --colors --hot --content-base .
+mock-server:
+	@node ../../fake_backend/index.js &

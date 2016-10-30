@@ -1,29 +1,31 @@
-function getEntrySources() {
-    var sources = [];
-
-    if (process.env.NODE_ENV !== 'production') { // for live reload
-        sources.push('webpack-dev-server/client?http://0.0.0.0:8088');
-        sources.push('webpack/hot/dev-server');
-    }
-    sources.push('./config-webpack.js'); // must be the last one
-
-    return sources;
-}
+var debug = process.env.NODE_ENV !== "production"
+var webpack = require('webpack')
+var path = require('path')
 
 module.exports = {
-    entry: {
-        'app': getEntrySources()
+  devtool: debug ? "inline-sourcemap" : null,
+  entry: "./js/main.js",
+  module: {
+    loaders: [
+      {
+        test: /\.js$/,
+        exclude: /(node_modules)/,
+        loader: 'babel-loader',
+      }
+    ]
+  },
+  output: {
+    path: path.join(__dirname, "examples/list_test"),
+    filename: "main.min.js"
+  },
+  plugins: debug ? [] : [
+    new webpack.optimize.DedupePlugin(),
+    new webpack.optimize.OccurenceOrderPlugin(),
+    new webpack.optimize.UglifyJsPlugin({ mangle: false, sourcemap: false }),
+  ],
+  resolve: {
+    alias: {
+      'react-mobx-admin': path.join(__dirname, '../..'),
     },
-    output: {
-        path: __dirname + '/build',
-        filename: '[name].js'
-    },
-    module: {
-        loaders: [
-            { test: /config-webpack\.js$/, loaders: ['react-hot', 'babel'] }
-        ]
-    },
-    node: {
-        fs: 'empty'
-    }
-};
+  }
+}

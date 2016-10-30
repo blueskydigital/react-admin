@@ -1,17 +1,14 @@
 {
-  "name": "react-admin-blog",
-  "version": "0.0.1",
-  "description": "React.js blog example",
+  "name": "react-mobx-admin-blog",
+  "version": "0.0.2",
+  "description": "blog example made with react-mobx-admin",
   "dependencies": {
-    "react": "0.13.*",
-    "react-router": "0.13.*"
+    "react-dom": "^15.3.0",
+    "react-tap-event-plugin": "^1.0.0"
   },
   "devDependencies": {
-    "babel": "^5.6.2",
-    "babel-loader": "^5.1.4",
-    "webpack": "^1.9.11",
-    "webpack-dev-server": "^1.9.0"
+    "mobx-react-devtools": "^4.2.6"
   },
-  "author": "marmelab <info@marmelab.com>",
+  "author": "vencax <vencax77@gmail.com>",
   "license": "MIT"
 }
