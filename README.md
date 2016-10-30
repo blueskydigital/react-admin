@@ -1,10 +1,10 @@
 # React-admin [![Build Status](https://travis-ci.org/marmelab/react-admin.svg?branch=master)](https://travis-ci.org/marmelab/react-admin)
 
-Add a ReactJS admin GUI to any RESTful API. Based on [ng-admin](https://github.com/marmelab/ng-admin).
-
 # Development is discontinued !!!
 
-> We continued with [react-mobx-admin](https://github.com/blueskydigital/react-mobx-admin). Adopting ideas from amaizing [admin-on-rest](https://github.com/marmelab/admin-on-rest) utilizing [MobX](https://mobxjs.github.io/mobx/) as a state manager.
+## > We continued with [react-mobx-admin](https://github.com/blueskydigital/react-mobx-admin). Adopting ideas from amaizing [admin-on-rest](https://github.com/marmelab/admin-on-rest) utilizing [MobX](https://mobxjs.github.io/mobx/) as a state manager.
+
+Add a ReactJS admin GUI to any RESTful API. Based on [ng-admin](https://github.com/marmelab/ng-admin).
 
 [![Screencast](http://marmelab.com/ng-admin/images/screencast.png)](https://vimeo.com/118697682)
 
