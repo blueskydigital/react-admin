@@ -2,11 +2,13 @@
 
 Add a ReactJS admin GUI to any RESTful API. Based on [ng-admin](https://github.com/marmelab/ng-admin).
 
+# Development is discontinued !!!
+
+> We continued with [react-mobx-admin](https://github.com/blueskydigital/react-mobx-admin). Adopting ideas from amaizing [admin-on-rest](https://github.com/marmelab/admin-on-rest) utilizing [MobX](https://mobxjs.github.io/mobx/) as a state manager.
+
 [![Screencast](http://marmelab.com/ng-admin/images/screencast.png)](https://vimeo.com/118697682)
 
-## Status
-
-Development is pre-beta but is progressing fast. React-admin will be backwards compatible with ng-admin, which means that the API for describing an admin will be the same:
+React-admin will be backwards compatible with ng-admin, which means that the API for describing an admin will be the same:
 
 ```js
 var ad = AdminDescription;
